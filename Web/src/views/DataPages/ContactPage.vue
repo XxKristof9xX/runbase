@@ -23,4 +23,7 @@ export default {};
   text-align: left;
   font-size: 12px;
 }
+h1 {
+  font-size: 3em;
+}
 </style>

@@ -105,5 +105,7 @@ export default {
 </script>
 
 <style>
-/* Tetszőleges stílus */
+h1 {
+  font-size: 3em;
+}
 </style>

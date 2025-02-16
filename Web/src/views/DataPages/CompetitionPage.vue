@@ -78,6 +78,10 @@ h3 {
   padding-top: 10px;
   color: black;
 }
+
+h1 {
+  font-size: 3em;
+}
 img{
   /* width: 10em; */
 }

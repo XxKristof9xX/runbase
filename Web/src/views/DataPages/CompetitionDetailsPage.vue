@@ -23,3 +23,10 @@ export default {
   },
 };
 </script>
+
+<style>
+h1 {
+  font-size: 3em;
+}
+</style>
+

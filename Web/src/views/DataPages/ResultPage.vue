@@ -364,4 +364,7 @@ th {
 .post-select{
   height: 30px !important;
 }
+h1 {
+  font-size: 3em;
+}
 </style>

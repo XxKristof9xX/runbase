@@ -139,6 +139,6 @@ a {
   color: #42b983;
 }
 h1 {
-  font-size: 2em;
+  font-size: 3em;
 }
 </style>
