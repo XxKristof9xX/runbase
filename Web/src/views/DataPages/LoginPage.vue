@@ -67,7 +67,7 @@ export default {
   created() {
     // Felhasználói adatok betöltése az API-ból
     axios
-      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login")
+      .get("/api/felhasznalok/login")
       .then((response) => {
         this.loginDatas = response.data;
       })
