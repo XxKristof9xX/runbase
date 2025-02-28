@@ -51,7 +51,7 @@ export default {
   },
   created() {
     axios
-      .get("http://localhost:5000/api/versenyek")
+      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
       .then((response) => {
         console.log(response.data);
         this.competitions = response.data;

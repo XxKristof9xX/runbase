@@ -163,7 +163,7 @@ export default {
 
   created() {
     axios
-      .get("http://localhost:5000/api/versenyindulas")
+      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
       .then((response) => {
         console.log(response.data);
         this.results = response.data;
@@ -171,7 +171,7 @@ export default {
       .catch((error) => console.log(error));
 
     axios
-      .get("http://localhost:5000/api/versenyek")
+      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
       .then((response) => {
         console.log(this.competitions.data);
         this.competitions = response.data;
@@ -179,7 +179,7 @@ export default {
       .catch((error) => console.log(error));
 
     axios
-      .get("http://localhost:5000/api/versenytav")
+      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
       .then((response) => {
         console.log(this.competitionDistances.data);
         this.competitionDistances = response.data;
@@ -187,7 +187,7 @@ export default {
       .catch((error) => console.log(error));
 
     axios
-      .get("http://localhost:5000/api/tavok")
+      .get("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/tavok")
       .then((response) => {
         console.log(this.distances.data);
         this.distances = response.data;
@@ -330,7 +330,7 @@ export default {
         console.log(article);
 
         axios
-          .post("http://localhost:5000/api/versenyindulas", article)
+          .post("runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", article)
           .then((response) => (this.articleId = response.data.id));
         window.alert("Sikeres feltöltés!");
       }
