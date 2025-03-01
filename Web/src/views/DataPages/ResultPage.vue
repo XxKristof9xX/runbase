@@ -186,32 +186,20 @@ export default {
       })
       .catch((error) => console.log(error));
 
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/tavok")
-      .then((response) => {
-        console.log(this.distances.data);
-        this.distances = response.data;
-      })
-      .catch((error) => console.log(error));
   },
   methods: {
     fillup(event) {
       document.getElementById("selectedDistance").selectedIndex = 0;
-      (this.competitionDistanceIDs = []),
-        (this.selectedCompetitionDistances = []),
-        this.competitionDistances.forEach((element) => {
-          if (element.versenyID == event.target.selectedIndex) {
-            this.competitionDistanceIDs.push(element.tavID);
-          }
-        });
-      this.competitionDistanceIDs.forEach((element) => {
-        this.distances.forEach((item) => {
-          if (element == item.tavID) {
-            this.selectedCompetitionDistances.push(item.tav);
-          }
-        });
+      this.selectedCompetitionDistances = [];
+      
+      this.competitionDistances.forEach((element) => {
+        if (element.versenyID == event.target.selectedIndex) {
+          this.selectedCompetitionDistances.push(element.tav);
+        }
       });
-    },
+    
+},
+
     competitionResult() {
       this.competitionResults = [];
       var selectedDistanceID;
