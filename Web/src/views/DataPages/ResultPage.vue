@@ -44,7 +44,7 @@
                 type="button"
                 @click="sortedByCompetitionId()"
                 class="btn btn-light"
-                value="versenyId"
+                value="Verseny Azonosító"
               />
             </th>
             <th>
@@ -52,7 +52,7 @@
                 type="button"
                 @click="sortedByDistanceId()"
                 class="btn btn-light"
-                value="Táv"
+                value="Távok"
               />
             </th>
             <th>
@@ -60,7 +60,7 @@
                 type="button"
                 @click="sortedByNameId()"
                 class="btn btn-light"
-                value="Versenyző ID"
+                value="Versenyző Azonosító"
               />
             </th>
             <th>
@@ -90,7 +90,7 @@
           </tr>
           <tr v-for="r in competitionResults" :key="r.Id">
             <td>{{ r.versenyId }}</td>
-            <td>{{ r.tav }}</td>
+            <td>{{ r.tav }} km</td>
             <td>{{ r.versenyzoId }}</td>
             <td>{{ r.indulas }}</td>
             <td>{{ r.erkezes }}</td>
@@ -115,7 +115,7 @@
             :key="a.nev"
             v-bind:value="a.versenyId"
           >
-            {{ a.versenyId }}
+            {{ a.nev }}
           </option>
         </select>
         <select name="" Id="postDistanceId" class="col-2 post-select" required>
