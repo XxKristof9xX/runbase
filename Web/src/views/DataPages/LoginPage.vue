@@ -3,7 +3,7 @@
   <div class="container">
     <div class="row">
       <form @submit.prevent="login">
-        <!-- Username input -->
+        <!-- Felhasználónév input -->
         <div class="form-outline mb-4">
           <input
             type="text"
@@ -15,7 +15,7 @@
           <label class="form-label" for="username">Felhasználónév</label>
         </div>
 
-        <!-- Password input -->
+        <!-- Jelszó input -->
         <div class="form-outline mb-4">
           <input
             type="password"
@@ -27,7 +27,7 @@
           <label class="form-label" for="password">Jelszó</label>
         </div>
 
-        <!-- Remember me checkbox -->
+        <!-- "Emlékezzen rám" checkbox -->
         <div class="form-check mb-4">
           <input
             class="form-check-input"
@@ -40,7 +40,12 @@
           </label>
         </div>
 
-        <!-- Submit button -->
+        <!-- Hibaüzenet (ha van) -->
+        <div v-if="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Bejelentkezés gomb -->
         <button type="submit" class="btn btn-primary btn-block mb-4">
           Bejelentkezés
         </button>
@@ -55,52 +60,50 @@ import axios from "axios";
 export default {
   data() {
     return {
-      loginDatas: [], // Az API-tól érkező felhasználói adatok
       form: {
-        username: "", // Felhasználónév
-        password: "", // Jelszó
-        remember: false, // "Emlékezzen rám" opció
+        username: "",
+        password: "",
+        remember: false,
       },
+      errorMessage: "", 
     };
   },
-
-  created() {
-    // Felhasználói adatok betöltése az API-ból
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login")
-      .then((response) => {
-        this.loginDatas = response.data;
-      })
-      .catch((error) => console.error("API hiba:", error));
-  },
-
   methods: {
-    login() {
-      // Felhasználó ellenőrzése
-      const user = this.loginDatas.find(
-        (user) =>
-          user.felhasznalonev === this.form.username &&
-          user.jelszo === this.form.password
+  async login() {
+    try {
+      console.log("Elküldött adatok:", this.form.username, this.form.password);
+
+      const response = await axios.post(
+        "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
+        {
+          Nev: this.form.username,
+          Jelszo: this.form.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (user) {
-        // Sikeres bejelentkezés
+      console.log("API teljes válasz:", response);
+      console.log("API válasz (data):", response.data);
+
+      if (typeof response.data === "string" && response.data.includes("Sikeres")) {
         window.alert("Sikeres bejelentkezés!");
-        this.$router.push("/"); // Átirányítás a főoldalra
 
-        // Opcionális: Bejelentkezési adatok tárolása (ha a "Remember me" be van jelölve)
-        if (this.form.remember) {
-          localStorage.setItem("user", JSON.stringify(user));
-        }
-
-        // Bejelentkezési állapot frissítése
+        this.$router.push("/");
         this.$root.$emit("loginStatusChanged", true);
       } else {
-        // Sikertelen bejelentkezés
-        window.alert("Helytelen felhasználónév vagy jelszó!");
+        this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
       }
-    },
+    } catch (error) {
+      console.error("Bejelentkezési hiba:", error.response);
+      this.errorMessage =
+        error.response?.data || "Hiba történt a bejelentkezés során!";
+    }
   },
+},
 };
 </script>
 
