@@ -6,9 +6,9 @@
         <select
           class="form-select"
           @change="fillup($event), competitionResult()"
-          id="selectedCompetition"
+          Id="selectedCompetition"
         >
-          <option value="" selected disabled hidden>
+          <option value="" selected disabled hIdden>
             Válasszon egy versenyt!
           </option>
           <option v-for="a in competitions" :key="a.nev" v-bind:value="a.nev">
@@ -20,7 +20,7 @@
       <div class="col-6">
         <select
           class="form-select"
-          id="selectedDistance"
+          Id="selectedDistance"
           @change="competitionResult()"
         >
           <option value="" selected disabled hidden>
@@ -28,10 +28,10 @@
           </option>
           <option
             v-for="a in selectedCompetitionDistances"
-            :key="a.tavID"
-            v-bind:value="a.tavID"
+            :key="a.tavId"
+            v-bind:value="JSON.stringify(a)"
           >
-            {{ a }} km
+            {{ a.tav }} km
           </option>
         </select>
       </div>
@@ -42,25 +42,25 @@
             <th>
               <input
                 type="button"
-                @click="sortedByCompetitionID()"
+                @click="sortedByCompetitionId()"
                 class="btn btn-light"
-                value="VersenyID"
+                value="versenyId"
               />
             </th>
             <th>
               <input
                 type="button"
-                @click="sortedByDistanceID()"
+                @click="sortedByDistanceId()"
                 class="btn btn-light"
-                value="TávID"
+                value="Táv"
               />
             </th>
             <th>
               <input
                 type="button"
-                @click="sortedByNameID()"
+                @click="sortedByNameId()"
                 class="btn btn-light"
-                value="NévID"
+                value="Versenyző ID"
               />
             </th>
             <th>
@@ -68,7 +68,7 @@
                 type="button"
                 @click="sortedByStart()"
                 class="btn btn-light"
-                value="Indulási idő"
+                value="Indulási Idő"
               />
             </th>
             <th>
@@ -76,7 +76,7 @@
                 type="button"
                 @click="sortedByFinish()"
                 class="btn btn-light"
-                value="Érkezési idő"
+                value="Érkezési Idő"
               />
             </th>
             <th>
@@ -88,10 +88,10 @@
               />
             </th>
           </tr>
-          <tr v-for="r in competitionResults" :key="r.id">
-            <td>{{ r.versenyID }}</td>
+          <tr v-for="r in competitionResults" :key="r.Id">
+            <td>{{ r.versenyId }}</td>
             <td>{{ r.tav }}</td>
-            <td>{{ r.versenyzoID }}</td>
+            <td>{{ r.versenyzoId }}</td>
             <td>{{ r.indulas }}</td>
             <td>{{ r.erkezes }}</td>
             <td>{{ r.rajtszam }}</td>
@@ -102,38 +102,38 @@
       <div >
         <select
           name=""
-          id="postCompetitionID"
+          Id="postCompetitionId"
           class="col-2 post-select"
           @change="postFillUpCompetitionsDistances($event)"
           required
         >
-        <option value="" selected disabled hidden>
+        <option value="" selected disabled hIdden>
             Válasszon egy versenyt!
         </option>
           <option
             v-for="a in competitions"
             :key="a.nev"
-            v-bind:value="a.versenyID"
+            v-bind:value="a.versenyId"
           >
-            {{ a.versenyID }}
+            {{ a.versenyId }}
           </option>
         </select>
-        <select name="" id="postDistanceID" class="col-2 post-select" required>
-          <option value="" selected disabled hidden>
+        <select name="" Id="postDistanceId" class="col-2 post-select" required>
+          <option value="" selected disabled hIdden>
             Válasszon egy távot!
         </option>
           <option
             v-for="a in postCompetitionDistances"
             :key="a.nev"
-            v-bind:value="a.nev"
+            v-bind:value="a"
           >
             {{ a }}
           </option>
         </select>
-        <input type="text" id="postCompetitorID" class="col-2" required />
-        <input type="text" id="postStart" class="col-2" required />
-        <input type="text" id="postFinish" class="col-2" required />
-        <input type="text" id="postStartNumber" class="col-2" required />    
+        <input type="text" Id="postCompetitorId" class="col-2" required />
+        <input type="text" Id="postStart" class="col-2" required />
+        <input type="text" Id="postFinish" class="col-2" required />
+        <input type="text" Id="postStartNumber" class="col-2" required />    
       </div>
 
       <div class="mt-4">
@@ -154,7 +154,7 @@ export default {
       distances: [],
       sortedResults: [],
       competitionDistances: [],
-      competitionDistanceIDs: [],
+      competitionDistanceIds: [],
       selectedCompetitionDistances: [],
       postCompetitionDistances: [],
       ascDesc: 0,
@@ -192,58 +192,60 @@ export default {
       document.getElementById("selectedDistance").selectedIndex = 0;
       this.selectedCompetitionDistances = [];
       
-      this.competitionDistances.forEach((element) => {
-        if (element.versenyID == event.target.selectedIndex) {
-          this.selectedCompetitionDistances.push(element.tav);
-        }
-      });
-    
-},
+      (this.competitionDistanceIds = []),
+        (this.selectedCompetitionDistances = []),
+        this.competitionDistances.forEach((element) => {
+          if (element.versenyId == event.target.selectedIndex) {
+            this.selectedCompetitionDistances.push(element);
+          }
+        });
+      // this.competitionDistances.forEach((element) => {
+      //   this.distances.forEach((item) => {
+      //     if (element == item.tavId) {
+      //       this.selectedCompetitionDistances.push(item.tav);
+      //     }
+      //   });
+      // });
+    },
 
     competitionResult() {
       this.competitionResults = [];
-      var selectedDistanceID;
+      var selectedDistanceId=0;
 
       if (document.getElementById("selectedDistance").selectedIndex == 0) {
         this.results.forEach((element) => {
           if (
-            element.versenyID ==
+            element.versenyId ==
             document.getElementById("selectedCompetition").selectedIndex
           ) {
             this.competitionResults.push(element);
           }
         });
       } else {
-        this.distances.forEach((element) => {
-          if (
-            element.tav ==
-            document.getElementById("selectedDistance").value.match(/(\d+)/)[0]
-          ) {
-            selectedDistanceID = element.tavID;
-          }
-        });
+            selectedDistanceId = document.getElementById("selectedDistance").value.match(/(\d+)/)[0];
+
 
         this.results.forEach((element) => {
           if (
-            element.versenyID ==
+            element.versenyId ==
               document.getElementById("selectedCompetition").selectedIndex &&
-            element.tav == selectedDistanceID
+            element.tav == selectedDistanceId
           ) {
             this.competitionResults.push(element);
           }
         });
       }
     },
-    sortedByCompetitionID() {
+    sortedByCompetitionId() {
       if (this.ascDesc % 2 == 0) {
-        this.competitionResults.sort((a, b) => a.versenyID - b.versenyID);
+        this.competitionResults.sort((a, b) => a.versenyId - b.versenyId);
       } else {
-        this.competitionResults.sort((a, b) => b.versenyID - a.versenyID);
+        this.competitionResults.sort((a, b) => b.versenyId - a.versenyId);
       }
       this.ascDesc += 1;
     },
 
-    sortedByDistanceID() {
+    sortedByDistanceId() {
       if (this.ascDesc % 2 == 0) {
         this.competitionResults.sort((a, b) => a.tav - b.tav);
       } else {
@@ -252,11 +254,11 @@ export default {
       this.ascDesc += 1;
     },
 
-    sortedByNameID() {
+    sortedByNameId() {
       if (this.ascDesc % 2 == 0) {
-        this.competitionResults.sort((a, b) => a.versenyzoID - b.versenyzoID);
+        this.competitionResults.sort((a, b) => a.versenyzoId - b.versenyzoId);
       } else {
-        this.competitionResults.sort((a, b) => b.versenyzoID - a.versenyzoID);
+        this.competitionResults.sort((a, b) => b.versenyzoId - a.versenyzoId);
       }
       this.ascDesc += 1;
     },
@@ -293,24 +295,24 @@ export default {
     postFillUpCompetitionsDistances(event) {
       this.postCompetitionDistances = [];
       this.competitionDistances.forEach((element) => {
-        if (element.versenyID == event.target.value) {
-          this.postCompetitionDistances.push(element.tavID);
+        if (element.versenyId == event.target.value) {
+          this.postCompetitionDistances.push(element.tavId);
         }
       });
     },
     post() {
       if (
-        document.getElementById("postCompetitionID").value.length != 0 &&
-        document.getElementById("postDistanceID").value.length != 0 &&
-        document.getElementById("postCompetitorID").value.length != 0 &&
+        document.getElementById("postCompetitionId").value.length != 0 &&
+        document.getElementById("postDistanceId").value.length != 0 &&
+        document.getElementById("postCompetitorId").value.length != 0 &&
         document.getElementById("postStart").value.length != 0 &&
         document.getElementById("postFinish").value.length != 0 &&
         document.getElementById("postStartNumber").value.length != 0
       ) {
         const article = {
-          versenyzoID: document.getElementById("postCompetitorID").value,
-          versenyID: document.getElementById("postCompetitionID").value,
-          tav: document.getElementById("postDistanceID").value,
+          versenyzoId: document.getElementById("postCompetitorId").value,
+          versenyId: document.getElementById("postCompetitionId").value,
+          tav: document.getElementById("postDistanceId").value,
           indulas: document.getElementById("postStart").value,
           erkezes: document.getElementById("postStart").value,
           rajtszam: document.getElementById("postStartNumber").value,
@@ -319,7 +321,7 @@ export default {
 
         axios
           .post("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", article)
-          .then((response) => (this.articleId = response.data.id));
+          .then((response) => (this.articleId = response.data.Id));
         window.alert("Sikeres feltöltés!");
       }
       else{
