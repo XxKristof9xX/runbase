@@ -124,7 +124,7 @@
         </option>
           <option
             v-for="a in postCompetitionDistances"
-            :key="a.nev"
+            :key="a"
             v-bind:value="a"
           >
             {{ a }}
@@ -296,7 +296,7 @@ export default {
       this.postCompetitionDistances = [];
       this.competitionDistances.forEach((element) => {
         if (element.versenyId == event.target.value) {
-          this.postCompetitionDistances.push(element.tavId);
+          this.postCompetitionDistances.push(element.tav);
         }
       });
     },
