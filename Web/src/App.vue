@@ -33,10 +33,12 @@
 </template>
 
 <script>
+import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 
 export default {
   setup() {
+    const router = useRouter();
     const isLoggedIn = ref(false);
 
     // Bejelentkezési állapot ellenőrzése
@@ -60,6 +62,7 @@ export default {
       sessionStorage.removeItem("user");
       checkLoginStatus();
       window.dispatchEvent(new Event("loginStatusChanged")); // Fejléc frissítése
+      router.push("/");
     };
 
     return { isLoggedIn, logout };

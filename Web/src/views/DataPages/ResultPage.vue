@@ -199,13 +199,6 @@ export default {
             this.selectedCompetitionDistances.push(element);
           }
         });
-      // this.competitionDistances.forEach((element) => {
-      //   this.distances.forEach((item) => {
-      //     if (element == item.tavId) {
-      //       this.selectedCompetitionDistances.push(item.tav);
-      //     }
-      //   });
-      // });
     },
 
     competitionResult() {

@@ -61,9 +61,8 @@ export default {
 
         // Felhasználó mentése és esemény küldése
         sessionStorage.setItem("user", this.form.username);
-        window.dispatchEvent(new Event("loginStatusChanged")); 
-        
-        this.$router.push("/");
+        window.dispatchEvent(new Event("loginStatusChanged"));
+        this.$router.push("/");       
       } else {
         this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
       }
