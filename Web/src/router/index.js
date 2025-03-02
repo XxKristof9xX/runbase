@@ -5,6 +5,7 @@ import Result from '../views/DataPages/ResultPage.vue'
 import Contact from '../views/DataPages/ContactPage.vue'
 import CompetitionDetails from '../views/DataPages/CompetitionDetailsPage.vue'
 import Login from '../views/DataPages/LoginPage.vue'
+import Profile from '../views/DataPages/ProfilePage.vue'
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/profil',
+    name: 'profil',
+    component: Profile
   }
 ]
 

@@ -3,28 +3,23 @@
   <div class="container">
     <div class="row">
       <form @submit.prevent="login">
-        <!-- Felhasználónév input -->
         <div class="form-outline mb-4">
           <input type="text" id="username" class="form-control" v-model="form.username" required />
           <label class="form-label" for="username">Felhasználónév</label>
         </div>
 
-        <!-- Jelszó input -->
         <div class="form-outline mb-4">
           <input type="password" id="password" class="form-control" v-model="form.password" required />
           <label class="form-label" for="password">Jelszó</label>
         </div>
 
-        <!-- "Emlékezzen rám" checkbox -->
         <div class="form-check mb-4">
           <input class="form-check-input" type="checkbox" id="rememberMe" v-model="form.remember" />
           <label class="form-check-label" for="rememberMe">Emlékezzen rám</label>
         </div>
 
-        <!-- Hibaüzenet (ha van) -->
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-        <!-- Bejelentkezés gomb -->
         <button type="submit" class="btn btn-primary btn-block mb-4">Bejelentkezés</button>
       </form>
     </div>
@@ -66,7 +61,7 @@ export default {
 
         // Felhasználó mentése és esemény küldése
         sessionStorage.setItem("user", this.form.username);
-        window.dispatchEvent(new Event("loginStatusChanged")); // Fejléc frissítése
+        window.dispatchEvent(new Event("loginStatusChanged")); 
         
         this.$router.push("/");
       } else {
