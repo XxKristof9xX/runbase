@@ -21,6 +21,11 @@
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
         <button type="submit" class="btn btn-primary btn-block mb-4">Bejelentkezés</button>
+
+        <p class="text-center">
+          Még nincs fiókja? 
+          <router-link to="/registration" class="text-primary">Regisztráljon itt</router-link>
+        </p>
       </form>
     </div>
   </div>
