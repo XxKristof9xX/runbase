@@ -29,17 +29,20 @@
   
       // Felhasználói adatok betöltése a sessionStorage-ból
       const loadUserData = () => {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-          user.value = {
-            username: storedUser,
-            email: storedUser.toLowerCase() + "@example.com",
-            registered: "2024-01-01", 
-          };
-        } else {
-          router.push("/login"); 
-        }
-      };
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+    const parsedUser = JSON.parse(storedUser); // JSON visszaalakítása objektummá
+
+    user.value = {
+      id: parsedUser.id, 
+      username: parsedUser.nev,
+      email: parsedUser.nev.toLowerCase() + "@example.com", // Helyesen elérve a nevet
+      registered: "2024-01-01",
+    };
+  } else {
+    router.push("/login"); 
+  }
+};
   
       // Kijelentkezés
       const logout = () => {
