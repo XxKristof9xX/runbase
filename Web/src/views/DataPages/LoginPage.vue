@@ -76,7 +76,7 @@ export default {
         id: user.id,
         nev: user.nev,
         tipus: user.tipus,
-        versenyzoId: user.versenyzoId || "Még nincs hozzárendelve versenyző",
+        versenyzoId: user.versenyzoId,
       };
 
       sessionStorage.setItem("user", JSON.stringify(userData));
