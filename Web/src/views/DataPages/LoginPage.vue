@@ -56,11 +56,31 @@ export default {
         }
       );
 
+     
+
+      
+
+
+
       if (typeof response.data === "string" && response.data.includes("Sikeres")) {
         window.alert("Sikeres bejelentkezés!");
 
+        const userResponse = await axios.get(
+        "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok",
+        { params: { nev: this.form.username } }
+      );
+
+      const user = Array.isArray(userResponse.data) ? userResponse.data[0] : userResponse.data;
+
+      const userData = {
+        id: user.id,
+        nev: user.nev,
+        tipus: user.tipus,
+        versenyzoId: user.versenyzoId ||"Még nincs hozzárendelve versenyző",
+      };
+
         // Felhasználó mentése és esemény küldése
-        sessionStorage.setItem("user", this.form.username);
+        sessionStorage.setItem("user", JSON.stringify(userData));
         window.dispatchEvent(new Event("loginStatusChanged"));
         this.$router.push("/");       
       } else {
