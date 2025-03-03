@@ -4,9 +4,9 @@
       <div v-if="user">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Felhasználónév: {{ user.username }}</h5>
-            <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
-            <p class="card-text"><strong>Regisztráció dátuma:</strong> {{ user.registered }}</p>
+            <h5 class="card-title">Felhasználónév: <strong>{{ user.username }}</strong></h5>
+            <p class="card-text"><strong>Felhasználó típus:</strong> {{ user.type }}</p>
+            <p class="card-text"><strong>Versenyző azonosító:</strong> {{ user.competitorId }}</p>
           </div>
         </div>
         <button class="btn btn-danger mt-3" @click="logout">Kijelentkezés</button>
@@ -31,13 +31,13 @@
       const loadUserData = () => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
-    const parsedUser = JSON.parse(storedUser); // JSON visszaalakítása objektummá
+    const parsedUser = JSON.parse(storedUser);
 
     user.value = {
       id: parsedUser.id, 
       username: parsedUser.nev,
-      email: parsedUser.nev.toLowerCase() + "@example.com", // Helyesen elérve a nevet
-      registered: "2024-01-01",
+      type: parsedUser.tipus,
+      competitorId: parsedUser.versenyzoId,
     };
   } else {
     router.push("/login"); 

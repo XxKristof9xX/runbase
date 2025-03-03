@@ -41,56 +41,51 @@ export default {
     };
   },
   methods: {
-  async login() {
-    try {
-      const response = await axios.post(
-        "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
-        {
-          Nev: this.form.username,
-          Jelszo: this.form.password,
+    async login() {
+  try {
+    const response = await axios.post(
+      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
+      {
+        Nev: this.form.username,
+        Jelszo: this.form.password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      }
+    );
+
+    if (typeof response.data === "string" && response.data.includes("Sikeres")) {
+      window.alert("Sikeres bejelentkezés!");
+
+      // ✅ Felhasználói adatok lekérése username alapján
+      const userResponse = await axios.get(
+        `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${this.form.username}`
       );
 
-     
+      const user = userResponse.data;
 
-      
-
-
-
-      if (typeof response.data === "string" && response.data.includes("Sikeres")) {
-        window.alert("Sikeres bejelentkezés!");
-
-        const userResponse = await axios.get(
-        "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok",
-        { params: { nev: this.form.username } }
-      );
-
-      const user = Array.isArray(userResponse.data) ? userResponse.data[0] : userResponse.data;
-
+      // ✅ Felhasználó adatainak mentése sessionStorage-ba
       const userData = {
         id: user.id,
         nev: user.nev,
         tipus: user.tipus,
-        versenyzoId: user.versenyzoId ||"Még nincs hozzárendelve versenyző",
+        versenyzoId: user.versenyzoId || "Még nincs hozzárendelve versenyző",
       };
 
-        // Felhasználó mentése és esemény küldése
-        sessionStorage.setItem("user", JSON.stringify(userData));
-        window.dispatchEvent(new Event("loginStatusChanged"));
-        this.$router.push("/");       
-      } else {
-        this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
-      }
-    } catch (error) {
-      this.errorMessage = error.response?.data || "Hiba történt a bejelentkezés során!";
+      sessionStorage.setItem("user", JSON.stringify(userData));
+      window.dispatchEvent(new Event("loginStatusChanged"));
+
+      this.$router.push("/");
+    } else {
+      this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
     }
-  },
+  } catch (error) {
+    this.errorMessage = error.response?.data || "Hiba történt a bejelentkezés során!";
+  }
 },
+  }
 };
 </script>
 
