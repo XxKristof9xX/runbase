@@ -10,14 +10,13 @@
         </div>
       </div>
 
-      <!-- Gomb csak akkor látható, ha van competitorId -->
       <button
         v-if="user.competitorId"
         type="button"
         class="btn btn-primary mt-3"
         data-bs-toggle="modal"
         data-bs-target="#exampleModal6"
-        @click="fetchCompetitionResults"
+        @click="fetchCompetitorData"
       >
         Leírás
       </button>
@@ -35,42 +34,34 @@
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title text-danger" id="exampleModalLabel6">Üdvözöljük!</h5>
+              <h5 class="modal-title text-danger" id="exampleModalLabel6">
+                Üdvözöljük, {{ competitorName || "Versenyző" }}!
+              </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <h4 class="text-start">Versenyeken elért eredményeid:</h4>
 
-              <!-- Betöltési állapot -->
-              <div v-if="isLoading">Adatok betöltése...</div>
-              <div v-else-if="errorMessage" class="text-danger">{{ errorMessage }}</div>
-
-              <!-- Ha vannak eredmények, megjelenítés táblázatban -->
-              <div v-else-if="competitionResults.length">
-                <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                  <table class="table mt-3">
-                    <thead>
-                      <tr>
-                        <th><button @click="sortedByCompetitionID" class="btn btn-light">VersenyID</button></th>
-                        <th><button @click="sortedByDistanceID" class="btn btn-light">TávID</button></th>
-                        <th><button @click="sortedByStart" class="btn btn-light">Indulási idő</button></th>
-                        <th><button @click="sortedByFinish" class="btn btn-light">Érkezési idő</button></th>
-                        <th><button @click="sortedByStartNumber" class="btn btn-light">Rajtszám</button></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="r in competitionResults" :key="r.id">
-                        <td>{{ r.versenyId }}</td>
-                        <td>{{ r.tav }}</td>
-                        <td>{{ r.indulas }}</td>
-                        <td>{{ r.erkezes }}</td>
-                        <td>{{ r.rajtszam }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table mt-3">
+                  <tr>
+                    <th>VersenyID</th>
+                    <th>TávID</th>
+                    <th>NévID</th>
+                    <th>Indulási idő</th>
+                    <th>Érkezési idő</th>
+                    <th>Rajtszám</th>
+                  </tr>
+                  <tr v-for="r in competitionResults" :key="r.id">
+                    <td>{{ r.versenyId }}</td>
+                    <td>{{ r.tav }}</td>
+                    <td>{{ r.versenyzoId }}</td>
+                    <td>{{ r.indulas }}</td>
+                    <td>{{ r.erkezes }}</td>
+                    <td>{{ r.rajtszam }}</td>
+                  </tr>
+                </table>
               </div>
-              <div v-else>Nincsenek versenyindulási adatok.</div>
             </div>
           </div>
         </div>
@@ -94,8 +85,7 @@ export default {
     const router = useRouter();
     const user = ref(null);
     const competitionResults = ref([]);
-    const isLoading = ref(false);
-    const errorMessage = ref("");
+    const competitorName = ref("");
 
     // Felhasználói adatok betöltése
     const loadUserData = () => {
@@ -113,24 +103,21 @@ export default {
       }
     };
 
-    // Versenyindulási adatok lekérése API-ból
-    const fetchCompetitionResults = async () => {
+    // Versenyző adatainak és eredményeinek lekérése
+    const fetchCompetitorData = async () => {
       if (!user.value.competitorId) return;
-
-      isLoading.value = true;
-      errorMessage.value = "";
-      competitionResults.value = [];
-
       try {
-        const response = await axios.get(
-          `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`
-        );
-        competitionResults.value = response.data;
+        const [competitorResponse, resultsResponse] = await Promise.all([
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`)
+        ]);
+        
+        competitorName.value = competitorResponse.data.nev;
+        competitionResults.value = resultsResponse.data;
       } catch (error) {
-        errorMessage.value =
-          error.response?.data || "Hiba történt az adatok lekérésekor.";
-      } finally {
-        isLoading.value = false;
+        console.error("Hiba történt az adatok lekérésekor:", error);
+        competitorName.value = "Ismeretlen versenyző";
+        competitionResults.value = [];
       }
     };
 
@@ -141,37 +128,14 @@ export default {
       router.push("/");
     };
 
-    // Eredmények rendezése
-    const sortedByCompetitionID = () => {
-      competitionResults.value.sort((a, b) => a.versenyId - b.versenyId);
-    };
-    const sortedByDistanceID = () => {
-      competitionResults.value.sort((a, b) => a.tav - b.tav);
-    };
-    const sortedByStart = () => {
-      competitionResults.value.sort((a, b) => new Date(a.indulas) - new Date(b.indulas));
-    };
-    const sortedByFinish = () => {
-      competitionResults.value.sort((a, b) => new Date(a.erkezes) - new Date(b.erkezes));
-    };
-    const sortedByStartNumber = () => {
-      competitionResults.value.sort((a, b) => a.rajtszam - b.rajtszam);
-    };
-
     onMounted(loadUserData);
 
     return {
       user,
       logout,
       competitionResults,
-      fetchCompetitionResults,
-      isLoading,
-      errorMessage,
-      sortedByCompetitionID,
-      sortedByDistanceID,
-      sortedByStart,
-      sortedByFinish,
-      sortedByStartNumber,
+      competitorName,
+      fetchCompetitorData,
     };
   },
 };
