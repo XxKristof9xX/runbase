@@ -10,13 +10,14 @@
         </div>
       </div>
 
-      <!-- Leírás gomb (csak ha van versenyző ID) -->
+      <!-- Gomb csak akkor látható, ha van competitorId -->
       <button
         v-if="user.competitorId"
         type="button"
         class="btn btn-primary mt-3"
         data-bs-toggle="modal"
         data-bs-target="#exampleModal6"
+        @click="fetchCompetitionResults"
       >
         Leírás
       </button>
@@ -40,38 +41,36 @@
             <div class="modal-body">
               <h4 class="text-start">Versenyeken elért eredményeid:</h4>
 
-              <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                <table class="table mt-3">
-                  <tr>
-                    <th>
-                      <input type="button" @click="sortedByCompetitionID()" class="btn btn-light" value="VersenyID" />
-                    </th>
-                    <th>
-                      <input type="button" @click="sortedByDistanceID()" class="btn btn-light" value="TávID" />
-                    </th>
-                    <th>
-                      <input type="button" @click="sortedByNameID()" class="btn btn-light" value="NévID" />
-                    </th>
-                    <th>
-                      <input type="button" @click="sortedByStart()" class="btn btn-light" value="Indulási idő" />
-                    </th>
-                    <th>
-                      <input type="button" @click="sortedByFinish()" class="btn btn-light" value="Érkezési idő" />
-                    </th>
-                    <th>
-                      <input type="button" @click="sortedByStartNumber()" class="btn btn-light" value="Rajtszám" />
-                    </th>
-                  </tr>
-                  <tr v-for="r in competitionResults" :key="r.id">
-                    <td>{{ r.versenyID }}</td>
-                    <td>{{ r.tav }}</td>
-                    <td>{{ r.versenyzoID }}</td>
-                    <td>{{ r.indulas }}</td>
-                    <td>{{ r.erkezes }}</td>
-                    <td>{{ r.rajtszam }}</td>
-                  </tr>
-                </table>
+              <!-- Betöltési állapot -->
+              <div v-if="isLoading">Adatok betöltése...</div>
+              <div v-else-if="errorMessage" class="text-danger">{{ errorMessage }}</div>
+
+              <!-- Ha vannak eredmények, megjelenítés táblázatban -->
+              <div v-else-if="competitionResults.length">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                  <table class="table mt-3">
+                    <thead>
+                      <tr>
+                        <th><button @click="sortedByCompetitionID" class="btn btn-light">VersenyID</button></th>
+                        <th><button @click="sortedByDistanceID" class="btn btn-light">TávID</button></th>
+                        <th><button @click="sortedByStart" class="btn btn-light">Indulási idő</button></th>
+                        <th><button @click="sortedByFinish" class="btn btn-light">Érkezési idő</button></th>
+                        <th><button @click="sortedByStartNumber" class="btn btn-light">Rajtszám</button></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="r in competitionResults" :key="r.id">
+                        <td>{{ r.versenyId }}</td>
+                        <td>{{ r.tav }}</td>
+                        <td>{{ r.indulas }}</td>
+                        <td>{{ r.erkezes }}</td>
+                        <td>{{ r.rajtszam }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
+              <div v-else>Nincsenek versenyindulási adatok.</div>
             </div>
           </div>
         </div>
@@ -88,12 +87,15 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
   setup() {
     const router = useRouter();
     const user = ref(null);
     const competitionResults = ref([]);
+    const isLoading = ref(false);
+    const errorMessage = ref("");
 
     // Felhasználói adatok betöltése
     const loadUserData = () => {
@@ -111,6 +113,27 @@ export default {
       }
     };
 
+    // Versenyindulási adatok lekérése API-ból
+    const fetchCompetitionResults = async () => {
+      if (!user.value.competitorId) return;
+
+      isLoading.value = true;
+      errorMessage.value = "";
+      competitionResults.value = [];
+
+      try {
+        const response = await axios.get(
+          `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`
+        );
+        competitionResults.value = response.data;
+      } catch (error) {
+        errorMessage.value =
+          error.response?.data || "Hiba történt az adatok lekérésekor.";
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
     // Kijelentkezés
     const logout = () => {
       sessionStorage.removeItem("user");
@@ -120,13 +143,10 @@ export default {
 
     // Eredmények rendezése
     const sortedByCompetitionID = () => {
-      competitionResults.value.sort((a, b) => a.versenyID - b.versenyID);
+      competitionResults.value.sort((a, b) => a.versenyId - b.versenyId);
     };
     const sortedByDistanceID = () => {
       competitionResults.value.sort((a, b) => a.tav - b.tav);
-    };
-    const sortedByNameID = () => {
-      competitionResults.value.sort((a, b) => a.versenyzoID.localeCompare(b.versenyzoID));
     };
     const sortedByStart = () => {
       competitionResults.value.sort((a, b) => new Date(a.indulas) - new Date(b.indulas));
@@ -144,9 +164,11 @@ export default {
       user,
       logout,
       competitionResults,
+      fetchCompetitionResults,
+      isLoading,
+      errorMessage,
       sortedByCompetitionID,
       sortedByDistanceID,
-      sortedByNameID,
       sortedByStart,
       sortedByFinish,
       sortedByStartNumber,

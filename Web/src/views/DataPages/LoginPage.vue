@@ -64,14 +64,12 @@ export default {
     if (typeof response.data === "string" && response.data.includes("Sikeres")) {
       window.alert("Sikeres bejelentkezés!");
 
-      // ✅ Felhasználói adatok lekérése username alapján
       const userResponse = await axios.get(
         `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${this.form.username}`
       );
 
       const user = userResponse.data;
 
-      // ✅ Felhasználó adatainak mentése sessionStorage-ba
       const userData = {
         id: user.id,
         nev: user.nev,
