@@ -10,20 +10,19 @@
         </div>
       </div>
 
-      <button
-        v-if="user.competitorId"
-        type="button"
-        class="btn btn-primary mt-3"
-        data-bs-toggle="modal"
-        data-bs-target="#exampleModal6"
-        @click="fetchCompetitorData"
-      >
+      <div v-if="!user.competitorId">
+        <h5 class="mt-3">Versenyző azonosítása</h5>
+        <input v-model="tajszam" type="text" class="form-control mt-2" placeholder="TAJ szám megadása" />
+        <button class="btn btn-success mt-2" @click="identifyCompetitor">Azonosítás</button>
+        <p v-if="message" :class="{'text-success': success, 'text-danger': !success}">{{ message }}</p>
+      </div>
+
+      <button v-if="user.competitorId" type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal6" @click="fetchCompetitorData">
         Leírás
       </button>
 
       <button class="btn btn-danger mt-3 ms-2" @click="logout">Kijelentkezés</button>
 
-      <!-- Modal -->
       <div
         class="modal fade bd-example-modal-lg"
         id="exampleModal6"
@@ -66,7 +65,6 @@
           </div>
         </div>
       </div>
-      <!-- Modal vége -->
     </div>
     <div v-else>
       <p>Nincs bejelentkezett felhasználó.</p>
@@ -86,6 +84,9 @@ export default {
     const user = ref(null);
     const competitionResults = ref([]);
     const competitorName = ref("");
+    const tajszam = ref("");
+    const message = ref("");
+    const success = ref(false);
 
     // Felhasználói adatok betöltése
     const loadUserData = () => {
@@ -111,7 +112,7 @@ export default {
           axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
           axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`)
         ]);
-        
+         
         competitorName.value = competitorResponse.data.nev;
         competitionResults.value = resultsResponse.data;
       } catch (error) {
@@ -120,6 +121,57 @@ export default {
         competitionResults.value = [];
       }
     };
+
+    // Versenyző azonosítása TAJ szám alapján
+    const identifyCompetitor = async () => {
+  if (!tajszam.value) {
+    message.value = "Kérlek, add meg a TAJ számot!";
+    success.value = false;
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`
+    );
+
+    if (response.status === 200 && response.data.versenyzoId) {
+      const competitorId = response.data.versenyzoId;
+
+      const updatedUser = { 
+        id: user.value.id,
+        nev: user.value.username, 
+        versenyzoId: competitorId 
+      };
+      const putResponse = await axios.put(
+        `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${user.value.id}`,
+        updatedUser
+      );
+
+      if (putResponse.status === 204) {
+        user.value = { ...user.value, competitorId };
+        sessionStorage.setItem("user", JSON.stringify(user.value));
+        message.value = "Azonosítás sikeres!";
+        success.value = true;
+        tajszam.value = "";
+      } else {
+        message.value = "Azonosítás sikertelen, próbáld újra!";
+        success.value = false;
+      }
+    } else {
+      message.value = "Hibás TAJ szám, kérlek próbáld újra!";
+      success.value = false;
+    }
+  } catch (error) {
+    console.error("Hiba történt az azonosításkor:", error);
+    message.value = error.response?.data?.message || "Hiba történt az azonosítás során.";
+    success.value = false;
+  }
+};
+
+
+
+
 
     // Kijelentkezés
     const logout = () => {
@@ -136,6 +188,10 @@ export default {
       competitionResults,
       competitorName,
       fetchCompetitorData,
+      tajszam,
+      identifyCompetitor,
+      message,
+      success,
     };
   },
 };
