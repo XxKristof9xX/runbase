@@ -7,6 +7,7 @@ import CompetitionDetails from '../views/DataPages/CompetitionDetailsPage.vue'
 import Login from '../views/DataPages/LoginPage.vue'
 import Profile from '../views/DataPages/ProfilePage.vue'
 import Register from '../views/DataPages/RegisterPage.vue'
+import AdministrativPage from '@/views/DataPages/AdministrativPage.vue'
 
 const routes = [
   {
@@ -55,7 +56,13 @@ const routes = [
     path: '/registration',
     name: 'registration',
     component: Register
+  },
+  {
+    path: '/adminPage',
+    name: 'adminPage',
+    component: AdministrativPage
   }
+
 ]
 
 const router = createRouter({

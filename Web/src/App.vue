@@ -16,6 +16,12 @@
             <router-link to="/eredmenyek" class="nav-item nav-link">Eredmények</router-link>
             <router-link to="/kapcsolat" class="nav-item nav-link">Kapcsolat</router-link>
           </div>
+
+          <!-- Admin panel csak adminoknak és szervezőknek -->
+          <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
+            <router-link to="/adminPage" class="nav-item nav-link">Admin Panel</router-link>
+          </div>
+
           <div class="navbar-nav ms-auto">
             <template v-if="isLoggedIn">
               <router-link to="/profil" class="nav-item nav-link">Profil</router-link>
@@ -26,7 +32,7 @@
         </div>
       </div>
     </nav>
-    
+
     <!-- Tartalom -->
     <router-view />
   </div>
@@ -34,45 +40,55 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 export default {
   setup() {
     const router = useRouter();
     const isLoggedIn = ref(false);
+    const userRole = ref(null);
 
-    // Bejelentkezési állapot ellenőrzése
     const checkLoginStatus = () => {
-      isLoggedIn.value = !!sessionStorage.getItem("user");
+      const user = sessionStorage.getItem("user");
+      if (user) {
+        const parsedUser = JSON.parse(user);
+        isLoggedIn.value = true;
+        userRole.value = parsedUser.tipus; // Olvassa közvetlenül a sessionStorage-ból
+      } else {
+        isLoggedIn.value = false;
+        userRole.value = null;
+      }
     };
 
-    // Frissítés nélküli állapotváltás figyelése
     const updateLoginStatus = () => {
       checkLoginStatus();
     };
 
-    // Login állapot frissítése eseményfigyelővel
     window.addEventListener("loginStatusChanged", updateLoginStatus);
-
-    // Indításkor ellenőrizzük az állapotot
     onMounted(checkLoginStatus);
 
-    // Kijelentkezés
     const logout = () => {
       sessionStorage.removeItem("user");
       checkLoginStatus();
-      window.dispatchEvent(new Event("loginStatusChanged")); // Fejléc frissítése
+      window.dispatchEvent(new Event("loginStatusChanged"));
       router.push("/");
     };
 
-    return { isLoggedIn, logout };
+    // Admin vagy szervező jogosultság ellenőrzése
+    const isAdminOrOrganizer = computed(() => {
+      return userRole.value === "admin" || userRole.value === "organizer";
+    });
+
+    return { 
+      isLoggedIn, 
+      isAdminOrOrganizer, 
+      logout 
+    };
   },
 };
 </script>
 
-
 <style>
-/* Globális beállítások */
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -81,12 +97,10 @@ export default {
   color: #2c3e50;
 }
 
-/* Háttérszín */
 body {
   background-color: #ADD8E6;
 }
 
-/* Navigáció */
 nav {
   background-color: #20283F;
 }
@@ -111,21 +125,18 @@ nav a:hover {
   color: #00bfff;
 }
 
-/* Logo */
 img {
   width: 7em;
   margin-bottom: 13px;
   float: left;
 }
 
-/* Bejelentkezés/Kijelentkezés gomb */
 #login {
   border: 2px solid white;
   border-radius: 5px;
   background-color: #6F8FAF;
 }
 
-/* Gombok igazítása */
 .nav-item.nav-link {
   padding: 10px 15px;
   border-radius: 5px;

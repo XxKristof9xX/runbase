@@ -170,9 +170,6 @@ export default {
 };
 
 
-
-
-
     // Kijelentkezés
     const logout = () => {
       sessionStorage.removeItem("user");
