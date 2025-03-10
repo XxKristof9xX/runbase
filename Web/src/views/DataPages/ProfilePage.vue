@@ -24,42 +24,65 @@
       <button class="btn btn-danger mt-3 ms-2" @click="logout">Kijelentkezés</button>
 
       <div
-        class="modal fade bd-example-modal-lg"
-        id="exampleModal6"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel6"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title text-danger" id="exampleModalLabel6">
-                Üdvözöljük, {{ competitorName || "Versenyző" }}!
-              </h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <h4 class="text-start">Versenyeken elért eredményeid:</h4>
-
-              <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                <table class="table mt-3">
-                  <tr>
-                    <th>VersenyID</th>
-                    <th>TávID</th>
-                    <th>NévID</th>
-                    <th>Indulási idő</th>
-                    <th>Érkezési idő</th>
-                    <th>Rajtszám</th>
-                  </tr>
-                  <tr v-for="r in competitionResults" :key="r.id">
-                    <td>{{ r.versenyId }}</td>
-                    <td>{{ r.tav }}</td>
-                    <td>{{ r.versenyzoId }}</td>
-                    <td>{{ r.indulas }}</td>
-                    <td>{{ r.erkezes }}</td>
-                    <td>{{ r.rajtszam }}</td>
-                  </tr>
-                </table>
+  class="modal fade bd-example-modal-lg"
+  id="exampleModal6"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel6"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="exampleModalLabel6">
+          Üdvözöljük, {{ competitorName || "Versenyző" }}!
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <h4 class="text-start">Versenyeken elért eredményeid:</h4>
+        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+          <table class="table mt-3">
+            <tr>
+              <th>VersenyID</th>
+              <th>TávID</th>
+              <th>NévID</th>
+              <th>Indulási idő</th>
+              <th>Érkezési idő</th>
+              <th>Rajtszám</th>
+              <th>Statisztika</th>
+            </tr>
+            <tr v-for="r in competitionResults" :key="r.id">
+              <td>{{ r.versenyId }}</td>
+              <td>{{ r.tav }}</td>
+              <td>{{ r.versenyzoId }}</td>
+              <td>{{ r.indulas }}</td>
+              <td>{{ r.erkezes }}</td>
+              <td>{{ r.rajtszam }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-info"
+                  @click="calculateStatistics(r.versenyId, r.tav)"
+                >
+                  Statisztika
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-if="statistics" class="mt-4">
+          <h5>Statisztikai adatok</h5>
+          <p v-if="statistics.error" class="text-danger">
+            <strong>Hiba:</strong> {{ statistics.error }}
+          </p>
+          <p v-else>
+            <strong>Helyezés:</strong> {{ statistics.rank }} / {{ statistics.total }}
+          </p>
+          <p><strong>Százalékos helyezés:</strong> {{ statistics.percentile }}%</p>
               </div>
             </div>
           </div>
@@ -88,7 +111,6 @@ export default {
     const message = ref("");
     const success = ref(false);
 
-    // Felhasználói adatok betöltése
     const loadUserData = () => {
       const storedUser = sessionStorage.getItem("user");
       if (storedUser) {
@@ -104,7 +126,6 @@ export default {
       }
     };
 
-    // Versenyző adatainak és eredményeinek lekérése
     const fetchCompetitorData = async () => {
       if (!user.value.competitorId) return;
       try {
@@ -122,7 +143,6 @@ export default {
       }
     };
 
-    // Versenyző azonosítása TAJ szám alapján
     const identifyCompetitor = async () => {
   if (!tajszam.value) {
     message.value = "Kérlek, add meg a TAJ számot!";
@@ -169,8 +189,59 @@ export default {
   }
 };
 
+const statistics = ref(null);
 
-    // Kijelentkezés
+const calculateStatistics = async (raceId, distanceId) => {
+  try {
+    const response = await axios.get(
+      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas"
+    );
+
+    const allResults = response.data;
+    const filteredResults = allResults.filter(
+      (r) => r.versenyId === raceId && r.tav === distanceId
+    );
+
+    if (!filteredResults.length) {
+      statistics.value = null;
+      return;
+    }
+
+    const competitorResult = competitionResults.value.find(
+      (r) => r.versenyId === raceId && r.tav === distanceId
+    );
+    if (!competitorResult) {
+      statistics.value = null;
+      return;
+    }
+
+    const competitorTime =
+      new Date(competitorResult.erkezes) - new Date(competitorResult.indulas);
+
+    const competitorPace = competitorTime / competitorResult.tav;
+    const allPaces = filteredResults.map((r) => {
+      return {
+        id: r.versenyzoId,
+        pace: (new Date(r.erkezes) - new Date(r.indulas)) / r.tav,
+      };
+    });
+
+    allPaces.sort((a, b) => a.pace - b.pace);
+
+    const rank = allPaces.findIndex((r) => r.id === competitorResult.versenyzoId) + 1;
+    const percentile = ((rank / allPaces.length) * 100).toFixed(2);
+
+    statistics.value = {
+      rank,
+      total: allPaces.length,
+      percentile,
+    };
+  } catch (error) {
+    console.error("Hiba a statisztika számításakor:", error);
+    statistics.value = null;
+  }
+};
+
     const logout = () => {
       sessionStorage.removeItem("user");
       window.dispatchEvent(new Event("loginStatusChanged"));
@@ -189,6 +260,8 @@ export default {
       identifyCompetitor,
       message,
       success,
+      statistics,
+      calculateStatistics,
     };
   },
 };
