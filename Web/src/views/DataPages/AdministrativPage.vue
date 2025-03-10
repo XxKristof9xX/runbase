@@ -56,7 +56,6 @@
       <h1>Nincs jogosultságod az oldal megtekintéséhez!</h1>
     </div>
 
-    <!-- Modal for editing users -->
     <v-dialog v-model="showEditUserDialog" max-width="500px">
       <v-card>
         <v-card-title>
@@ -71,6 +70,9 @@
               <v-col cols="12">
                 <v-select v-model="selectedUser.tipus" :items="userTypes" label="Típus"></v-select>
               </v-col>
+              <v-col cols="12">
+                <v-text-field v-model="selectedUser.versenyzoId" label="Versenyző ID" type="number"></v-text-field>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -82,7 +84,6 @@
       </v-card>
     </v-dialog>
 
-    <!-- Modal for editing competitors -->
     <v-dialog v-model="showEditCompetitorDialog" max-width="500px">
       <v-card>
         <v-card-title>
@@ -110,10 +111,10 @@
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="closeEditCompetitorDialog">Mégse</v-btn>
           <v-btn color="blue darken-1" text @click="saveCompetitor">Mentés</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</v-container>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
@@ -131,7 +132,7 @@ export default {
     const showEditCompetitorDialog = ref(false);
     const selectedUser = ref({});
     const selectedCompetitor = ref({});
-    const userTypes = ["user", "competitor", "organizer", "administrator"];
+    const userTypes = ["user","competitor","organizer","administrator"];
     const genderOptions = ["Férfi", "Nő"];
 
     const userHeaders = [
@@ -161,6 +162,7 @@ export default {
         const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/");
         users.value = response.data;
       } catch (error) {
+
         console.error("Hiba a felhasználók betöltésekor:", error);
       }
     };
@@ -188,6 +190,7 @@ export default {
         console.error("Hiba a felhasználó mentésekor:", error);
       }
     };
+
 
     const closeEditUserDialog = () => {
       showEditUserDialog.value = false;
