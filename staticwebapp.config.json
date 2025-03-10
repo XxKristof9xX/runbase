@@ -1,0 +1,15 @@
+{
+    "navigationFallback": {
+        "rewrite": "/index.html",
+        "exclude": [
+            "*.{css,scss,js,png,jpg,jpeg,gif,webp,svg,woff,woff2,ttf,eot,ico,json}"
+        ]
+    },
+    "routes": [
+        {
+            "route": "/versenyek*",
+            "redirect": "/versenyek",
+            "statusCode": 301
+        }
+    ]
+}
