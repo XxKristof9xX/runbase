@@ -55,7 +55,65 @@
     <div v-else class="text-center mt-5">
       <h1>Nincs jogosultságod az oldal megtekintéséhez!</h1>
     </div>
-  </v-container>
+
+    <!-- Modal for editing users -->
+    <v-dialog v-model="showEditUserDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Felhasználó módosítása</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field v-model="selectedUser.nev" label="Név"></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select v-model="selectedUser.tipus" :items="userTypes" label="Típus"></v-select>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeEditUserDialog">Mégse</v-btn>
+          <v-btn color="blue darken-1" text @click="saveUser">Mentés</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Modal for editing competitors -->
+    <v-dialog v-model="showEditCompetitorDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Versenyző módosítása</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field v-model="selectedCompetitor.nev" label="Név"></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field v-model="selectedCompetitor.szuletesiEv" label="Születési év" type="number"></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select v-model="selectedCompetitor.neme" :items="genderOptions" label="Nem"></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field v-model="selectedCompetitor.tajSzam" label="TAJ szám"></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeEditCompetitorDialog">Mégse</v-btn>
+          <v-btn color="blue darken-1" text @click="saveCompetitor">Mentés</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</v-container>
 </template>
 
 <script>
@@ -69,6 +127,12 @@ export default {
     const competitors = ref([]);
     const searchUsers = ref("");
     const searchCompetitors = ref("");
+    const showEditUserDialog = ref(false);
+    const showEditCompetitorDialog = ref(false);
+    const selectedUser = ref({});
+    const selectedCompetitor = ref({});
+    const userTypes = ["user", "competitor", "organizer", "administrator"];
+    const genderOptions = ["Férfi", "Nő"];
 
     const userHeaders = [
       { text: "ID", value: "id" },
@@ -108,6 +172,44 @@ export default {
       } catch (error) {
         console.error("Hiba a versenyzők betöltésekor:", error);
       }
+    };
+
+    const editUser = (user) => {
+      selectedUser.value = { ...user };
+      showEditUserDialog.value = true;
+    };
+
+    const saveUser = async () => {
+      try {
+        await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${selectedUser.value.id}`, selectedUser.value);
+        fetchUsers();
+        closeEditUserDialog();
+      } catch (error) {
+        console.error("Hiba a felhasználó mentésekor:", error);
+      }
+    };
+
+    const closeEditUserDialog = () => {
+      showEditUserDialog.value = false;
+    };
+
+    const editCompetitor = (competitor) => {
+      selectedCompetitor.value = { ...competitor };
+      showEditCompetitorDialog.value = true;
+    };
+
+    const saveCompetitor = async () => {
+      try {
+        await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${selectedCompetitor.value.versenyzoId}`, selectedCompetitor.value);
+        fetchCompetitors();
+        closeEditCompetitorDialog();
+      } catch (error) {
+        console.error("Hiba a versenyző mentésekor:", error);
+      }
+    };
+
+    const closeEditCompetitorDialog = () => {
+      showEditCompetitorDialog.value = false;
     };
 
     const deleteUser = async (id) => {
@@ -152,6 +254,18 @@ export default {
       searchCompetitors,
       userHeaders,
       competitorHeaders,
+      showEditUserDialog,
+      showEditCompetitorDialog,
+      selectedUser,
+      selectedCompetitor,
+      userTypes,
+      genderOptions,
+      editUser,
+      saveUser,
+      closeEditUserDialog,
+      editCompetitor,
+      saveCompetitor,
+      closeEditCompetitorDialog,
       deleteUser,
       deleteCompetitor,
     };
