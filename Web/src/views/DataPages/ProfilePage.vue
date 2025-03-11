@@ -80,9 +80,9 @@
             <strong>Hiba:</strong> {{ statistics.error }}
           </p>
           <p v-else>
-            <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}
+            <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}.
           </p>
-          <p><strong>Százalékos helyezés:</strong> {{ statistics.percentile }}%</p>
+          <p><strong>Adott versenykategóriában elindult versenyzők:</strong> {{ statistics.total }}</p>
               </div>
             </div>
           </div>
