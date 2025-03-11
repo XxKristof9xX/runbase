@@ -196,8 +196,31 @@ const calculateStatistics = async (raceId, distanceId) => {
     const response = await axios.get(
       "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas"
     );
-
     const allResults = response.data;
+
+    const allResultsInCategory=[];
+    const alapDatum = "2025-03-11";
+
+    allResults.forEach((result) => {
+      if(result.versenyId === raceId && result.tav === distanceId){
+        const differentiesInMs = new Date(`${alapDatum}T${result.erkezes}`) - new Date(`${alapDatum}T${result.indulas}`);
+        const differentiesInMin = differentiesInMs / 60000;
+        allResultsInCategory.push(differentiesInMin);
+      }
+    });
+    allResultsInCategory.sort();
+
+    let median;
+    if (allResultsInCategory.length % 2 === 0) {
+    const mid1 = allResultsInCategory[allResultsInCategory.length/2-1];
+    const mid2 = allResultsInCategory[allResultsInCategory.length/2];
+    median = (mid1 + mid2) / 2;
+  } else {
+  median = allResultsInCategory[Math.floor(allResultsInCategory.length+1/2)];
+  }
+
+
+
     const filteredResults = allResults.filter(
       (r) => r.versenyId === raceId && r.tav === distanceId
     );

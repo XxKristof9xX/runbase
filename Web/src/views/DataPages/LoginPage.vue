@@ -67,7 +67,6 @@ export default {
       const userResponse = await axios.get(
         `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${this.form.username}`
       );
-
       const user = userResponse.data;
 
       const userData = {
