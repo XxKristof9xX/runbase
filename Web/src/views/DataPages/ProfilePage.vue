@@ -205,10 +205,15 @@ const calculateStatistics = async (raceId, distanceId) => {
       if(result.versenyId === raceId && result.tav === distanceId){
         const differentiesInMs = new Date(`${alapDatum}T${result.erkezes}`) - new Date(`${alapDatum}T${result.indulas}`);
         const differentiesInMin = differentiesInMs / 60000;
-        allResultsInCategory.push(differentiesInMin);
+        allResultsInCategory.push(
+          {
+            id: result.versenyzoId,
+            eredmeny: differentiesInMin
+          }
+        );
       }
     });
-    allResultsInCategory.sort();
+    allResultsInCategory.sort((a, b) => a.timeInMinutes - b.timeInMinutes);
 
     let median;
     if (allResultsInCategory.length % 2 === 0) {
