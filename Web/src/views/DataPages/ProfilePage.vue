@@ -80,7 +80,7 @@
             <strong>Hiba:</strong> {{ statistics.error }}
           </p>
           <p v-else>
-            <strong>Helyezés:</strong> {{ statistics.rank }} / {{ statistics.total }}
+            <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}
           </p>
           <p><strong>Százalékos helyezés:</strong> {{ statistics.percentile }}%</p>
               </div>
@@ -208,12 +208,15 @@ const calculateStatistics = async (raceId, distanceId) => {
         allResultsInCategory.push(
           {
             id: result.versenyzoId,
-            eredmeny: differentiesInMin
+            result: differentiesInMin
           }
         );
       }
     });
-    allResultsInCategory.sort((a, b) => a.timeInMinutes - b.timeInMinutes);
+    allResultsInCategory.sort((a, b) => a.result - b.result);
+
+    const rank = allResultsInCategory.findIndex(result => result.id === user.value.competitorId) + 1;
+    console.log("rank: ",allResultsInCategory);
 
     let median;
     if (allResultsInCategory.length % 2 === 0) {
@@ -256,13 +259,10 @@ const calculateStatistics = async (raceId, distanceId) => {
 
     allPaces.sort((a, b) => a.pace - b.pace);
 
-    const rank = allPaces.findIndex((r) => r.id === competitorResult.versenyzoId) + 1;
-    const percentile = ((rank / allPaces.length) * 100).toFixed(2);
-
     statistics.value = {
       rank,
       total: allPaces.length,
-      percentile,
+      median
     };
   } catch (error) {
     console.error("Hiba a statisztika számításakor:", error);
