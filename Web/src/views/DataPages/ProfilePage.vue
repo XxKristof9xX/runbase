@@ -216,7 +216,6 @@ const calculateStatistics = async (raceId, distanceId) => {
     allResultsInCategory.sort((a, b) => a.result - b.result);
 
     const rank = allResultsInCategory.findIndex(result => result.id === user.value.competitorId) + 1;
-    console.log("rank: ",allResultsInCategory);
 
     let median;
     if (allResultsInCategory.length % 2 === 0) {
@@ -250,18 +249,10 @@ const calculateStatistics = async (raceId, distanceId) => {
       new Date(competitorResult.erkezes) - new Date(competitorResult.indulas);
 
     const competitorPace = competitorTime / competitorResult.tav;
-    const allPaces = filteredResults.map((r) => {
-      return {
-        id: r.versenyzoId,
-        pace: (new Date(r.erkezes) - new Date(r.indulas)) / r.tav,
-      };
-    });
-
-    allPaces.sort((a, b) => a.pace - b.pace);
 
     statistics.value = {
       rank,
-      total: allPaces.length,
+      total: allResultsInCategory.length,
       median
     };
   } catch (error) {
