@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <v-card class="pa-4 mb-4">
+    <v-card class="pa-4 mb-4 custom-card">
       <h2 class="mt-5 text-center">Verseny eredmény feltöltése</h2>
       <div v-if="isAuthorized">
         <div class="row g-3">
@@ -56,7 +56,7 @@
   </div>
 
   <v-container class="d-flex justify-center">
-    <v-card class="pa-4" max-width="600">
+    <v-card class="pa-4 custom-card">
       <h2 class="text-center">Verseny szerkesztése</h2>
 
       <v-row>
@@ -265,5 +265,10 @@ export default {
 .v-container {
   display: flex;
   justify-content: center;
+}
+
+.custom-card {
+  width: 100%;
+  max-width: 900px;
 }
 </style>
