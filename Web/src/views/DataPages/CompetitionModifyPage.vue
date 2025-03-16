@@ -1,88 +1,93 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mt-5 text-center">Verseny adatok feltöltése</h2>
-    <div v-if="isAuthorized">
-      <div class="row g-3">
-        <div class="col-sm-12 col-md-6">
-          <select
-            id="postCompetitionId"
-            class="form-select"
-            @change="postFillUpCompetitionsDistances($event)"
-            required
-          >
-            <option value="" selected disabled hidden>Válasszon egy versenyt!</option>
-            <option v-for="a in competitions" :key="a.versenyId" :value="a.versenyId">
-              {{ a.nev }}
-            </option>
-          </select>
+    <v-card class="pa-4 mb-4">
+      <h2 class="mt-5 text-center">Verseny eredmény feltöltése</h2>
+      <div v-if="isAuthorized">
+        <div class="row g-3">
+          <div class="col-sm-12 col-md-6">
+            <select
+              id="postCompetitionId"
+              class="form-select"
+              @change="postFillUpCompetitionsDistances($event)"
+              required
+            >
+              <option value="" selected disabled hidden>Válasszon egy versenyt!</option>
+              <option v-for="a in competitions" :key="a.versenyId" :value="a.versenyId">
+                {{ a.nev }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-12 col-md-6">
+            <select id="postDistanceId" class="form-select" required>
+              <option value="" selected disabled hidden>Válasszon egy távot!</option>
+              <option v-for="a in postCompetitionDistances" :key="a" :value="a">
+                {{ a }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-4">
+            <input type="text" id="postCompetitorId" class="form-control" placeholder="Versenyző ID" required />
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-4">
+            <input id="postStart" type="time" step="2" class="form-control" placeholder="Indulási idő" required />
+          </div>
+
+          <div class="col-sm-12 col-md-6 col-lg-4">
+            <input id="postFinish" type="time" step="2" class="form-control" placeholder="Érkezési idő" required />
+          </div>
+
+          <div class="col-sm-12 col-md-6">
+            <input type="text" id="postStartNumber" class="form-control" placeholder="Rajtszám" required />
+          </div>
         </div>
 
-        <div class="col-sm-12 col-md-6">
-          <select id="postDistanceId" class="form-select" required>
-            <option value="" selected disabled hidden>Válasszon egy távot!</option>
-            <option v-for="a in postCompetitionDistances" :key="a" :value="a">
-              {{ a }}
-            </option>
-          </select>
-        </div>
-
-        <div class="col-sm-12 col-md-6 col-lg-4">
-          <input type="text" id="postCompetitorId" class="form-control" placeholder="Versenyző ID" required />
-        </div>
-
-        <div class="col-sm-12 col-md-6 col-lg-4">
-          <input id="postStart" type="time" name="appointment-time" step="2" class="form-control" placeholder="Indulási idő" required />
-        </div>
-
-        <div class="col-sm-12 col-md-6 col-lg-4">
-          <input id="postFinish" type="time" name="appointment-time" step="2" class="form-control" placeholder="Érkezési idő" required />
-        </div>
-
-        <div class="col-sm-12 col-md-6">
-          <input type="text" id="postStartNumber" class="form-control" placeholder="Rajtszám" required />
+        <div class="d-flex justify-content-center mt-4">
+          <button @click="post" class="btn btn-success">Adatok feltöltése!</button>
         </div>
       </div>
 
-      <div class="d-flex justify-content-center mt-4">
-        <button @click="post" class="btn btn-success">Adatok feltöltése!</button>
+      <div v-else class="text-center mt-3">
+        <p class="text-danger">Nincs jogosultságod az oldal megtekintéséhez.</p>
       </div>
-    </div>
-
-    
-
-    <div v-else class="text-center mt-3">
-      <p class="text-danger">Nincs jogosultságod az oldal megtekintéséhez.</p>
-    </div>
+    </v-card>
   </div>
 
-  <v-container>
-    <v-row>
-      <v-col cols="12" md="4">
-        <v-select
-          v-model="selectedRaceId"
-          :items="competitions"
-          item-title="nev"
-          item-value="versenyId"
-          label="Válassz versenyt"
-          @update:modelValue="loadRace"
-        ></v-select>
-      </v-col>
-    </v-row>
+  <v-container class="d-flex justify-center">
+    <v-card class="pa-4" max-width="600">
+      <h2 class="text-center">Verseny szerkesztése</h2>
 
-    <v-form v-if="selectedRace" @submit.prevent="saveRace">
-      <v-text-field v-model="selectedRace.nev" label="Név" required></v-text-field>
-      <v-text-field v-model="selectedRace.helyszin" label="Helyszín" required></v-text-field>
-      <v-text-field v-model="selectedRace.datum" label="Dátum" type="date" required></v-text-field>
-      <v-textarea v-model="selectedRace.leiras" label="Leírás"></v-textarea>
-      <v-text-field v-model.number="selectedRace.maxLetszam" label="Max létszám" type="number" required></v-text-field>
-      
-      <v-file-input label="Kép feltöltése" @change="uploadImage"></v-file-input>
+      <v-row>
+        <v-col cols="12">
+          <v-select
+            v-model="selectedRaceId"
+            :items="competitions"
+            item-title="nev"
+            item-value="versenyId"
+            label="Válassz versenyt"
+            @update:modelValue="loadRace"
+          ></v-select>
+        </v-col>
+      </v-row>
 
-      <v-btn type="submit" color="primary">Mentés</v-btn>
-      <v-btn color="error" @click="deleteRace" class="ml-2">Törlés</v-btn>
-    </v-form>
+      <v-form v-if="selectedRace" @submit.prevent="saveRace">
+        <v-text-field v-model="selectedRace.nev" label="Név" required></v-text-field>
+        <v-text-field v-model="selectedRace.helyszin" label="Helyszín" required></v-text-field>
+        <v-text-field v-model="selectedRace.datum" label="Dátum" type="date" required></v-text-field>
+        <v-textarea v-model="selectedRace.leiras" label="Leírás"></v-textarea>
+        <v-text-field v-model.number="selectedRace.maxLetszam" label="Max létszám" type="number" required></v-text-field>
+        
+        <v-file-input label="Kép feltöltése" @change="uploadImage"></v-file-input>
+
+        <div class="d-flex justify-center mt-3">
+          <v-btn type="submit" color="primary">Mentés</v-btn>
+          <v-btn color="error" @click="deleteRace" class="ml-2">Törlés</v-btn>
+        </div>
+      </v-form>
+    </v-card>
   </v-container>
-
 </template>
 
 <script>
@@ -255,5 +260,10 @@ export default {
 .container {
   max-width: 900px;
   margin: auto;
+}
+
+.v-container {
+  display: flex;
+  justify-content: center;
 }
 </style>
