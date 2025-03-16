@@ -31,11 +31,11 @@
         </div>
 
         <div class="col-sm-12 col-md-6 col-lg-4">
-          <input type="datetime-local" id="postStart" class="form-control" placeholder="Indulási idő" required />
+          <input id="postStart" type="time" name="appointment-time" step="2" class="form-control" placeholder="Indulási idő" required />
         </div>
 
         <div class="col-sm-12 col-md-6 col-lg-4">
-          <input type="datetime-local" id="postFinish" class="form-control" placeholder="Érkezési idő" required />
+          <input id="postFinish" type="time" name="appointment-time" step="2" class="form-control" placeholder="Érkezési idő" required />
         </div>
 
         <div class="col-sm-12 col-md-6">
