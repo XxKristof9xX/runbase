@@ -98,47 +98,6 @@
           </tr>
         </table>
       </div>
-<h2 class="mt-5">Verseny adatok feltöltése</h2>
-      <div >
-        <select
-          name=""
-          Id="postCompetitionId"
-          class="col-2 post-select"
-          @change="postFillUpCompetitionsDistances($event)"
-          required
-        >
-        <option value="" selected disabled hIdden>
-            Válasszon egy versenyt!
-        </option>
-          <option
-            v-for="a in competitions"
-            :key="a.nev"
-            v-bind:value="a.versenyId"
-          >
-            {{ a.nev }}
-          </option>
-        </select>
-        <select name="" Id="postDistanceId" class="col-2 post-select" required>
-          <option value="" selected disabled hIdden>
-            Válasszon egy távot!
-        </option>
-          <option
-            v-for="a in postCompetitionDistances"
-            :key="a"
-            v-bind:value="a"
-          >
-            {{ a }}
-          </option>
-        </select>
-        <input type="text" Id="postCompetitorId" class="col-2" required />
-        <input type="text" Id="postStart" class="col-2" required />
-        <input type="text" Id="postFinish" class="col-2" required />
-        <input type="text" Id="postStartNumber" class="col-2" required />    
-      </div>
-
-      <div class="mt-4">
-      <input type="submit" @click="post()" value="Adatok feltöltése!" class="col-3" />
-      </div>
     </div>
   </div>
 </template>
@@ -292,35 +251,7 @@ export default {
           this.postCompetitionDistances.push(element.tav);
         }
       });
-    },
-    post() {
-      if (
-        document.getElementById("postCompetitionId").value.length != 0 &&
-        document.getElementById("postDistanceId").value.length != 0 &&
-        document.getElementById("postCompetitorId").value.length != 0 &&
-        document.getElementById("postStart").value.length != 0 &&
-        document.getElementById("postFinish").value.length != 0 &&
-        document.getElementById("postStartNumber").value.length != 0
-      ) {
-        const article = {
-          versenyzoId: document.getElementById("postCompetitorId").value,
-          versenyId: document.getElementById("postCompetitionId").value,
-          tav: document.getElementById("postDistanceId").value,
-          indulas: document.getElementById("postStart").value,
-          erkezes: document.getElementById("postStart").value,
-          rajtszam: document.getElementById("postStartNumber").value,
-        };
-        console.log(article);
-
-        axios
-          .post("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", article)
-          .then((response) => (this.articleId = response.data.Id));
-        window.alert("Sikeres feltöltés!");
-      }
-      else{
-        window.alert("Nincs minden mező kitöltve!")
-      }
-    },
+    }
   },
 };
 </script>
