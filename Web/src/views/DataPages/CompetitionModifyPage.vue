@@ -1,38 +1,54 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mt-5">Verseny adatok feltöltése</h2>
+    <h2 class="mt-5 text-center">Verseny adatok feltöltése</h2>
     <div v-if="isAuthorized">
-      <div>
-        <select
-          id="postCompetitionId"
-          class="col-2 post-select"
-          @change="postFillUpCompetitionsDistances($event)"
-          required
-        >
-          <option value="" selected disabled hidden>Válasszon egy versenyt!</option>
-          <option v-for="a in competitions" :key="a.versenyId" :value="a.versenyId">
-            {{ a.nev }}
-          </option>
-        </select>
-        
-        <select id="postDistanceId" class="col-2 post-select" required>
-          <option value="" selected disabled hidden>Válasszon egy távot!</option>
-          <option v-for="a in postCompetitionDistances" :key="a" :value="a">
-            {{ a }}
-          </option>
-        </select>
-        
-        <input type="text" id="postCompetitorId" class="col-2" placeholder="Versenyző ID" required />
-        <input type="text" id="postStart" class="col-2" placeholder="Indulási idő" required />
-        <input type="text" id="postFinish" class="col-2" placeholder="Érkezési idő" required />
-        <input type="text" id="postStartNumber" class="col-2" placeholder="Rajtszám" required />
+      <div class="row g-3">
+        <div class="col-sm-12 col-md-6">
+          <select
+            id="postCompetitionId"
+            class="form-select"
+            @change="postFillUpCompetitionsDistances($event)"
+            required
+          >
+            <option value="" selected disabled hidden>Válasszon egy versenyt!</option>
+            <option v-for="a in competitions" :key="a.versenyId" :value="a.versenyId">
+              {{ a.nev }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-sm-12 col-md-6">
+          <select id="postDistanceId" class="form-select" required>
+            <option value="" selected disabled hidden>Válasszon egy távot!</option>
+            <option v-for="a in postCompetitionDistances" :key="a" :value="a">
+              {{ a }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-sm-12 col-md-6 col-lg-4">
+          <input type="text" id="postCompetitorId" class="form-control" placeholder="Versenyző ID" required />
+        </div>
+
+        <div class="col-sm-12 col-md-6 col-lg-4">
+          <input type="datetime-local" id="postStart" class="form-control" placeholder="Indulási idő" required />
+        </div>
+
+        <div class="col-sm-12 col-md-6 col-lg-4">
+          <input type="datetime-local" id="postFinish" class="form-control" placeholder="Érkezési idő" required />
+        </div>
+
+        <div class="col-sm-12 col-md-6">
+          <input type="text" id="postStartNumber" class="form-control" placeholder="Rajtszám" required />
+        </div>
       </div>
 
-      <div class="mt-4">
-        <button @click="post" class="col-3 btn btn-success">Adatok feltöltése!</button>
+      <div class="d-flex justify-content-center mt-4">
+        <button @click="post" class="btn btn-success">Adatok feltöltése!</button>
       </div>
     </div>
-    <div v-else>
+
+    <div v-else class="text-center mt-3">
       <p class="text-danger">Nincs jogosultságod az oldal megtekintéséhez.</p>
     </div>
   </div>
@@ -167,3 +183,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+</style>
