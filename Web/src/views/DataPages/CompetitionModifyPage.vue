@@ -71,17 +71,13 @@ export default {
 
   },
   methods: {
-    fillup(event) {
-      document.getElementById("selectedDistance").selectedIndex = 0;
-      this.selectedCompetitionDistances = [];
-      
-      (this.competitionDistanceIds = []),
-        (this.selectedCompetitionDistances = []),
-        this.competitionDistances.forEach((element) => {
-          if (element.versenyId == event.target.selectedIndex) {
-            this.selectedCompetitionDistances.push(element);
-          }
-        });
+  postFillUpCompetitionsDistances(event) {
+      this.postCompetitionDistances = [];
+      this.competitionDistances.forEach((element) => {
+        if (element.versenyId == event.target.value) {
+          this.postCompetitionDistances.push(element.tav);
+        }
+      });
     },
   },
   setup() {
@@ -102,15 +98,27 @@ export default {
       }
     };
 
-    const postFillUpCompetitionsDistances = async (event) => {
+    const loadCompetitions = async () => {
+      try {
+        const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek");
+        competitions.value = response.data;
+        console.log("Versenyek betöltve:", competitions.value);
+      } catch (error) {
+        console.error("Hiba a versenyek betöltésekor:", error);
+      }
+    };
+
+    const handleCompetitionChange = async (event) => {
       const selectedCompetitionId = event.target.value;
       try {
         const response = await axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/verseny/${selectedCompetitionId}/tavok`);
         postCompetitionDistances.value = response.data;
+        console.log("Betöltött távok:", response.data);
       } catch (error) {
         console.error("Hiba a távok betöltésekor:", error);
       }
     };
+    
 
     const post = async () => {
       const competitionId = document.getElementById("postCompetitionId").value;
@@ -145,25 +153,17 @@ export default {
 
     onMounted(() => {
       loadUserData();
+      loadCompetitions();
     });
 
     return {
       competitions,
       postCompetitionDistances,
-      postFillUpCompetitionsDistances,
+      handleCompetitionChange,
       post,
       isAuthorized,
+      competitionDistances: [],
     };
   },
 };
 </script>
-
-<style scoped>
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-.post-select {
-  margin-right: 10px;
-}
-</style>
