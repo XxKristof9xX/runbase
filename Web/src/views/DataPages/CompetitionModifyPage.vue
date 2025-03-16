@@ -48,10 +48,41 @@
       </div>
     </div>
 
+    
+
     <div v-else class="text-center mt-3">
       <p class="text-danger">Nincs jogosultságod az oldal megtekintéséhez.</p>
     </div>
   </div>
+
+  <v-container>
+    <v-row>
+      <v-col cols="12" md="4">
+        <v-select
+          v-model="selectedRaceId"
+          :items="competitions"
+          item-title="nev"
+          item-value="versenyId"
+          label="Válassz versenyt"
+          @update:modelValue="loadRace"
+        ></v-select>
+      </v-col>
+    </v-row>
+
+    <v-form v-if="selectedRace" @submit.prevent="saveRace">
+      <v-text-field v-model="selectedRace.nev" label="Név" required></v-text-field>
+      <v-text-field v-model="selectedRace.helyszin" label="Helyszín" required></v-text-field>
+      <v-text-field v-model="selectedRace.datum" label="Dátum" type="date" required></v-text-field>
+      <v-textarea v-model="selectedRace.leiras" label="Leírás"></v-textarea>
+      <v-text-field v-model.number="selectedRace.maxLetszam" label="Max létszám" type="number" required></v-text-field>
+      
+      <v-file-input label="Kép feltöltése" @change="uploadImage"></v-file-input>
+
+      <v-btn type="submit" color="primary">Mentés</v-btn>
+      <v-btn color="error" @click="deleteRace" class="ml-2">Törlés</v-btn>
+    </v-form>
+  </v-container>
+
 </template>
 
 <script>
@@ -60,6 +91,12 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 
 export default {
+  data() {
+    return {
+      selectedRaceId: null,
+      selectedRace: null,
+    };
+  },
   created() {
     axios
       .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
@@ -95,6 +132,36 @@ export default {
         }
       });
     },
+
+    async loadRace() {
+      this.selectedRace = this.competitions.find(race => race.versenyId === this.selectedRaceId);
+    },
+    async saveRace() {
+      await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`, this.selectedRace);
+      alert("Verseny adatai frissítve.");
+    },
+    async deleteRace() {
+      if (confirm("Biztosan törölni szeretnéd ezt a versenyt?")) {
+        await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`);
+        this.selectedRace = null;
+        this.selectedRaceId = null;
+        alert("Verseny törölve.");
+      }
+    },
+    async uploadImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append("file", file, `${this.selectedRace.versenyId}.jpg`);
+      
+      // Az alábbi feltöltési mód feltételezi, hogy a backend támogatja a fájlok kezelését
+      await axios.post(`${this.apiUrl}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
+      alert("Kép feltöltve.");
+    }
   },
   setup() {
     const competitions = ref([]);

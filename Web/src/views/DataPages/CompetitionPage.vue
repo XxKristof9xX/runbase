@@ -27,7 +27,7 @@
       helyszin: c.helyszin,
       datum: c.datum,
       leiras: c.leiras,
-      max_letszam: c.max_letszam,
+      max_letszam: c.maxLetszam,
     },
   }"
 >
