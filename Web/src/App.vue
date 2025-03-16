@@ -17,9 +17,9 @@
             <router-link to="/kapcsolat" class="nav-item nav-link">Kapcsolat</router-link>
           </div>
 
-          <!-- Admin panel csak adminoknak és szervezőknek -->
           <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
             <router-link to="/adminPage" class="nav-item nav-link">Admin Panel</router-link>
+            <router-link to="/competitionModify" class="nav-item nav-link">Verseny Módosítás</router-link>
           </div>
 
           <div class="navbar-nav ms-auto">

@@ -8,6 +8,7 @@ import Login from '../views/DataPages/LoginPage.vue'
 import Profile from '../views/DataPages/ProfilePage.vue'
 import Register from '../views/DataPages/RegisterPage.vue'
 import AdministrativPage from '@/views/DataPages/AdministrativPage.vue'
+import CompetitionModify from '@/views/DataPages/CompetitionModifyPage.vue'
 
 const routes = [
   {
@@ -61,7 +62,14 @@ const routes = [
     path: '/adminPage',
     name: 'adminPage',
     component: AdministrativPage
+  },
+  {
+    path: '/competitionModify',
+    name: 'competitionModify',
+    component: CompetitionModify
   }
+
+
 
 ]
 
