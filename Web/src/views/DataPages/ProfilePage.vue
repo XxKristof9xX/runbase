@@ -120,6 +120,7 @@ export default {
           username: parsedUser.nev,
           type: parsedUser.tipus,
           competitorId: parsedUser.versenyzoId,
+          apiKey: parsedUser.apiKey,
         };
       } else {
         router.push("/login");

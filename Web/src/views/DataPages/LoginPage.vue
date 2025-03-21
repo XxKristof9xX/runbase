@@ -64,7 +64,7 @@ export default {
         if (response.data && response.data.apiKey) {
           window.alert("Sikeres bejelentkezés!");
 
-          const apiKey = response.data.apiKey; // API-kulcs kinyerése
+          const apiKey = response.data.apiKey; 
           const userData = {
             id: response.data.id,
             nev: response.data.nev,
@@ -73,13 +73,8 @@ export default {
             apiKey: apiKey,
           };
 
-          // Adatok mentése a sessionStorage-ba
           sessionStorage.setItem("user", JSON.stringify(userData));
-
-          // Axios alapértelmezett beállítása Bearer token használatra
           axios.defaults.headers.common["Authorization"] = `Bearer ${apiKey}`;
-
-          // Globális esemény kibocsátása
           window.dispatchEvent(new Event("loginStatusChanged"));
 
           this.$router.push("/");
