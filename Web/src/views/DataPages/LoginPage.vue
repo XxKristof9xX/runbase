@@ -61,21 +61,20 @@ export default {
           }
         );
 
-        if (response.data && response.data.apiKey) {
-          window.alert("Sikeres bejelentkezés!");
+        if (response.data && response.data.apiKey && response.data.user) {
+  window.alert("Sikeres bejelentkezés!");
 
-          const apiKey = response.data.apiKey; 
-          const userData = {
-            id: response.data.id,
-            nev: response.data.nev,
-            tipus: response.data.tipus,
-            versenyzoId: response.data.versenyzoId,
-            apiKey: apiKey,
-          };
+  const apiKey = response.data.apiKey;
+  const userData = {
+    id: response.data.user.id,
+    nev: response.data.user.nev,
+    tipus: response.data.user.tipus,
+    versenyzoId: response.data.user.versenyzoId,
+    apiKey: apiKey,
+  };
 
-          sessionStorage.setItem("user", JSON.stringify(userData));
-          axios.defaults.headers.common["Authorization"] = `Bearer ${apiKey}`;
-          window.dispatchEvent(new Event("loginStatusChanged"));
+  sessionStorage.setItem("user", JSON.stringify(userData));
+  window.dispatchEvent(new Event("loginStatusChanged"));
 
           this.$router.push("/");
         } else {

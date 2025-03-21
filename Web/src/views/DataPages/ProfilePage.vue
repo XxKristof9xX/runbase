@@ -126,7 +126,7 @@ export default {
         router.push("/login");
       }
     };
-
+    //axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
     const fetchCompetitorData = async () => {
       if (!user.value.competitorId) return;
       try {
