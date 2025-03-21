@@ -47,47 +47,50 @@ export default {
   },
   methods: {
     async login() {
-  try {
-    const response = await axios.post(
-      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
-      {
-        Nev: this.form.username,
-        Jelszo: this.form.password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      try {
+        const response = await axios.post(
+          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
+          {
+            Nev: this.form.username,
+            Jelszo: this.form.password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data && response.data.apiKey) {
+          window.alert("Sikeres bejelentkezés!");
+
+          const apiKey = response.data.apiKey; // API-kulcs kinyerése
+          const userData = {
+            id: response.data.id,
+            nev: response.data.nev,
+            tipus: response.data.tipus,
+            versenyzoId: response.data.versenyzoId,
+            apiKey: apiKey,
+          };
+
+          // Adatok mentése a sessionStorage-ba
+          sessionStorage.setItem("user", JSON.stringify(userData));
+
+          // Axios alapértelmezett beállítása Bearer token használatra
+          axios.defaults.headers.common["Authorization"] = `Bearer ${apiKey}`;
+
+          // Globális esemény kibocsátása
+          window.dispatchEvent(new Event("loginStatusChanged"));
+
+          this.$router.push("/");
+        } else {
+          this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
+        }
+      } catch (error) {
+        this.errorMessage = error.response?.data || "Hiba történt a bejelentkezés során!";
       }
-    );
-
-    if (typeof response.data === "string" && response.data.includes("Sikeres")) {
-      window.alert("Sikeres bejelentkezés!");
-
-      const userResponse = await axios.get(
-        `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${this.form.username}`
-      );
-      const user = userResponse.data;
-
-      const userData = {
-        id: user.id,
-        nev: user.nev,
-        tipus: user.tipus,
-        versenyzoId: user.versenyzoId,
-      };
-
-      sessionStorage.setItem("user", JSON.stringify(userData));
-      window.dispatchEvent(new Event("loginStatusChanged"));
-
-      this.$router.push("/");
-    } else {
-      this.errorMessage = "Helytelen felhasználónév vagy jelszó!";
-    }
-  } catch (error) {
-    this.errorMessage = error.response?.data || "Hiba történt a bejelentkezés során!";
-  }
-},
-  }
+    },
+  },
 };
 </script>
 
