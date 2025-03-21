@@ -131,8 +131,8 @@ export default {
       if (!user.value.competitorId) return;
       try {
         const [competitorResponse, resultsResponse] = await Promise.all([
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`)
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`, { headers: user.value.apiKey }),
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`, { headers: user.value.apiKey }),
         ]);
          
         competitorName.value = competitorResponse.data.nev;
@@ -153,7 +153,7 @@ export default {
 
   try {
     const response = await axios.get(
-      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`, { headers: user.value.apiKey }
     );
 
     if (response.status === 200 && response.data.versenyzoId) {
@@ -195,7 +195,7 @@ const statistics = ref(null);
 const calculateStatistics = async (raceId, distanceId) => {
   try {
     const response = await axios.get(
-      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas"
+      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", { headers: user.value.apiKey }
     );
     const allResults = response.data;
 
