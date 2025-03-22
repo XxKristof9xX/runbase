@@ -120,10 +120,13 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const userRole = ref(null);
+    const user = ref(null);
+    const router = useRouter();
     const users = ref([]);
     const competitors = ref([]);
     const searchUsers = ref("");
@@ -149,11 +152,26 @@ export default {
       { text: "Műveletek", value: "actions", sortable: false }
     ];
 
+    const loadUserData = () => {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            user.value = {
+                apiKey: parsedUser.apiKey,
+            };
+            userRole.value = parsedUser.tipus;
+            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        } else {
+            router.push("/login");
+        }
+    };
+
     const checkUserRole = () => {
       const user = sessionStorage.getItem("user");
       if (user) {
         const parsedUser = JSON.parse(user);
-        userRole.value = parsedUser.tipus;
+        
       }
     };
 
@@ -238,7 +256,7 @@ export default {
     };
 
     onMounted(() => {
-      checkUserRole();
+      loadUserData();
       fetchUsers();
       fetchCompetitors();
     });
