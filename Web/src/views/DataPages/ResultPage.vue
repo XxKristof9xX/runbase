@@ -148,26 +148,20 @@ export default {
 
   created() {
     if (this.isAuthorized) {
-      axios
-        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
+      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
         .then((response) => {
-          console.log(response.data);
           this.results = response.data;
         })
         .catch((error) => console.log(error));
 
-      axios
-        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
         .then((response) => {
-          console.log(this.competitions.data);
           this.competitions = response.data;
         })
         .catch((error) => console.log(error));
 
-      axios
-        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
+      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
         .then((response) => {
-          console.log(this.competitionDistances.data);
           this.competitionDistances = response.data;
         })
         .catch((error) => console.log(error));
