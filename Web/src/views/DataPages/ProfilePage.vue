@@ -122,17 +122,18 @@ export default {
           competitorId: parsedUser.versenyzoId,
           apiKey: parsedUser.apiKey,
         };
+        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
       }
     };
-    //axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+    
     const fetchCompetitorData = async () => {
       if (!user.value.competitorId) return;
       try {
         const [competitorResponse, resultsResponse] = await Promise.all([
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`, { headers: user.value.apiKey }),
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`, { headers: user.value.apiKey }),
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
+          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`),
         ]);
          
         competitorName.value = competitorResponse.data.nev;
@@ -153,8 +154,7 @@ export default {
 
   try {
     const response = await axios.get(
-      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`, { headers: user.value.apiKey }
-    );
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`);
 
     if (response.status === 200 && response.data.versenyzoId) {
       const competitorId = response.data.versenyzoId;
@@ -195,8 +195,7 @@ const statistics = ref(null);
 const calculateStatistics = async (raceId, distanceId) => {
   try {
     const response = await axios.get(
-      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", { headers: user.value.apiKey }
-    );
+      "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas");
     const allResults = response.data;
 
     const allResultsInCategory=[];
