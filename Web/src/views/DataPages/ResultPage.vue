@@ -8,7 +8,7 @@
           @change="fillup($event), competitionResult()"
           Id="selectedCompetition"
         >
-          <option value="" selected disabled hIdden>
+          <option value="" selected disabled hidden>
             Válasszon egy versenyt!
           </option>
           <option v-for="a in competitions" :key="a.nev" v-bind:value="a.nev">
@@ -66,7 +66,6 @@
             <th>
               <input
                 type="button"
-                @click="sortedByStart()"
                 class="btn btn-light"
                 value="Indulási Idő"
               />
@@ -74,7 +73,6 @@
             <th>
               <input
                 type="button"
-                @click="sortedByFinish()"
                 class="btn btn-light"
                 value="Érkezési Idő"
               />
@@ -106,27 +104,32 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+
 export default {
   setup() {
     const user = ref(null);
     const isAuthorized = ref(false);
     const router = useRouter();
-    
+
     const loadUserData = () => {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            user.value = {
-                apiKey: parsedUser.apiKey,
-            };
-            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
-        } else {
-            router.push("/login");
-        }
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        user.value = {
+          apiKey: parsedUser.apiKey,
+        };
+        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+      } else {
+        router.push("/login");
+      }
     };
 
     loadUserData();
+
+    return {
+      isAuthorized,
+    };
   },
   data() {
     return {
@@ -144,48 +147,49 @@ export default {
   },
 
   created() {
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
-      .then((response) => {
-        console.log(response.data);
-        this.results = response.data;
-      })
-      .catch((error) => console.log(error));
+    if (this.isAuthorized) {
+      axios
+        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
+        .then((response) => {
+          console.log(response.data);
+          this.results = response.data;
+        })
+        .catch((error) => console.log(error));
 
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
-      .then((response) => {
-        console.log(this.competitions.data);
-        this.competitions = response.data;
-      })
-      .catch((error) => console.log(error));
+      axios
+        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+        .then((response) => {
+          console.log(this.competitions.data);
+          this.competitions = response.data;
+        })
+        .catch((error) => console.log(error));
 
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
-      .then((response) => {
-        console.log(this.competitionDistances.data);
-        this.competitionDistances = response.data;
-      })
-      .catch((error) => console.log(error));
-
+      axios
+        .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
+        .then((response) => {
+          console.log(this.competitionDistances.data);
+          this.competitionDistances = response.data;
+        })
+        .catch((error) => console.log(error));
+    }
   },
   methods: {
     fillup(event) {
       document.getElementById("selectedDistance").selectedIndex = 0;
       this.selectedCompetitionDistances = [];
-      
-      (this.competitionDistanceIds = []),
-        (this.selectedCompetitionDistances = []),
-        this.competitionDistances.forEach((element) => {
-          if (element.versenyId == event.target.selectedIndex) {
-            this.selectedCompetitionDistances.push(element);
-          }
-        });
+
+      this.competitionDistanceIds = [];
+      this.selectedCompetitionDistances = [];
+      this.competitionDistances.forEach((element) => {
+        if (element.versenyId == event.target.selectedIndex) {
+          this.selectedCompetitionDistances.push(element);
+        }
+      });
     },
 
     competitionResult() {
       this.competitionResults = [];
-      var selectedDistanceId=0;
+      var selectedDistanceId = 0;
 
       if (document.getElementById("selectedDistance").selectedIndex == 0) {
         this.results.forEach((element) => {
@@ -197,8 +201,7 @@ export default {
           }
         });
       } else {
-            selectedDistanceId = document.getElementById("selectedDistance").value.match(/(\d+)/)[0];
-
+        selectedDistanceId = document.getElementById("selectedDistance").value.match(/(\d+)/)[0];
 
         this.results.forEach((element) => {
           if (
@@ -237,28 +240,6 @@ export default {
       }
       this.ascDesc += 1;
     },
-
-    sortedByStart() {
-      if (this.ascDesc % 2 == 0) {
-        this.competitionResults.sort(
-          (a, b) =>
-            new Date(a.indulas.getTime()) - new Date(b.indulas.getTime())
-        );
-      } else {
-        this.competitionResults.sort((a, b) => b.indulas.date - a.indulas.date);
-      }
-      this.ascDesc += 1;
-    },
-
-    sortedByFinish() {
-      if (this.ascDesc % 2 == 0) {
-        this.competitionResults.sort((a, b) => a.erkezes - b.erkezes);
-      } else {
-        this.competitionResults.sort((a, b) => b.erkezes - a.erkezes);
-      }
-      this.ascDesc += 1;
-    },
-
     sortedByStartNumber() {
       if (this.ascDesc % 2 == 0) {
         this.competitionResults.sort((a, b) => a.rajtszam - b.rajtszam);
@@ -267,14 +248,6 @@ export default {
       }
       this.ascDesc += 1;
     },
-    postFillUpCompetitionsDistances(event) {
-      this.postCompetitionDistances = [];
-      this.competitionDistances.forEach((element) => {
-        if (element.versenyId == event.target.value) {
-          this.postCompetitionDistances.push(element.tav);
-        }
-      });
-    }
   },
 };
 </script>
