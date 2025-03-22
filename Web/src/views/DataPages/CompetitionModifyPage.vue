@@ -96,96 +96,29 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 
 export default {
-  data() {
-    return {
-      selectedRaceId: null,
-      selectedRace: null,
-    };
-  },
-  created() {
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
-      .then((response) => {
-        console.log(response.data);
-        this.results = response.data;
-      })
-      .catch((error) => console.log(error));
-
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
-      .then((response) => {
-        console.log(this.competitions.data);
-        this.competitions = response.data;
-      })
-      .catch((error) => console.log(error));
-
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
-      .then((response) => {
-        console.log(this.competitionDistances.data);
-        this.competitionDistances = response.data;
-      })
-      .catch((error) => console.log(error));
-
-  },
-  methods: {
-  postFillUpCompetitionsDistances(event) {
-      this.postCompetitionDistances = [];
-      this.competitionDistances.forEach((element) => {
-        if (element.versenyId == event.target.value) {
-          this.postCompetitionDistances.push(element.tav);
-        }
-      });
-    },
-
-    async loadRace() {
-      this.selectedRace = this.competitions.find(race => race.versenyId === this.selectedRaceId);
-    },
-    async saveRace() {
-      await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`, this.selectedRace);
-      alert("Verseny adatai frissítve.");
-    },
-    async deleteRace() {
-      if (confirm("Biztosan törölni szeretnéd ezt a versenyt?")) {
-        await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`);
-        this.selectedRace = null;
-        this.selectedRaceId = null;
-        alert("Verseny törölve.");
-      }
-    },
-    async uploadImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const formData = new FormData();
-      formData.append("file", file, `${this.selectedRace.versenyId}.jpg`);
-      
-      // Az alábbi feltöltési mód feltételezi, hogy a backend támogatja a fájlok kezelését
-      await axios.post(`${this.apiUrl}/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      
-      alert("Kép feltöltve.");
-    }
-  },
   setup() {
     const competitions = ref([]);
     const postCompetitionDistances = ref([]);
     const user = ref(null);
     const isAuthorized = ref(false);
     const router = useRouter();
-
+    
     const loadUserData = () => {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = parsedUser;
-        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-      } else {
-        router.push("/login");
-      }
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            user.value = {
+                apiKey: parsedUser.apiKey,
+            };
+            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        } else {
+            router.push("/login");
+        }
     };
 
+    loadUserData();
+    axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
     const loadCompetitions = async () => {
       try {
         const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek");
@@ -253,6 +186,81 @@ export default {
       competitionDistances: [],
     };
   },
+
+  data() {
+    return {
+      selectedRaceId: null,
+      selectedRace: null,
+    };
+  },
+  
+  created() {
+    axios
+      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
+      .then((response) => {
+        console.log(response.data);
+        this.results = response.data;
+      })
+      .catch((error) => console.log(error));
+
+    axios
+      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+      .then((response) => {
+        console.log(this.competitions.data);
+        this.competitions = response.data;
+      })
+      .catch((error) => console.log(error));
+
+    axios
+      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
+      .then((response) => {
+        console.log(this.competitionDistances.data);
+        this.competitionDistances = response.data;
+      })
+      .catch((error) => console.log(error));
+
+  },
+  methods: {
+  postFillUpCompetitionsDistances(event) {
+      this.postCompetitionDistances = [];
+      this.competitionDistances.forEach((element) => {
+        if (element.versenyId == event.target.value) {
+          this.postCompetitionDistances.push(element.tav);
+        }
+      });
+    },
+
+    async loadRace() {
+      this.selectedRace = this.competitions.find(race => race.versenyId === this.selectedRaceId);
+    },
+    async saveRace() {
+      await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`, this.selectedRace);
+      alert("Verseny adatai frissítve.");
+    },
+    async deleteRace() {
+      if (confirm("Biztosan törölni szeretnéd ezt a versenyt?")) {
+        await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`);
+        this.selectedRace = null;
+        this.selectedRaceId = null;
+        alert("Verseny törölve.");
+      }
+    },
+    async uploadImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append("file", file, `${this.selectedRace.versenyId}.jpg`);
+      
+      // Az alábbi feltöltési mód feltételezi, hogy a backend támogatja a fájlok kezelését
+      await axios.post(`${this.apiUrl}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
+      alert("Kép feltöltve.");
+    }
+  },
+  
 };
 </script>
 
