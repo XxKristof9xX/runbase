@@ -118,7 +118,7 @@ export default {
         user.value = {
           apiKey: parsedUser.apiKey,
         };
-        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+        isAuthorized.value = ["admin", "organizer","user","competitor"].includes(parsedUser.tipus);
         axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
