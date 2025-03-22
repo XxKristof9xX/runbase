@@ -251,8 +251,6 @@ export default {
       
       const formData = new FormData();
       formData.append("file", file, `${this.selectedRace.versenyId}.jpg`);
-      
-      // Az alábbi feltöltési mód feltételezi, hogy a backend támogatja a fájlok kezelését
       await axios.post(`${this.apiUrl}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
