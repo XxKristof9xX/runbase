@@ -153,34 +153,24 @@ export default {
   }
 
   try {
-    const response = await axios.get(
-      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${tajszam.value}`);
+    const response = await axios.put(
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/addVersenyzo`,
+      {
+        tajSzam: tajszam.value,
+        felhasznaloId: user.value.id
+      }
+    );
+
+    console.log("API válasz:", response.data);
 
     if (response.status === 200 && response.data.versenyzoId) {
-      const competitorId = response.data.versenyzoId;
-
-      const updatedUser = { 
-        id: user.value.id,
-        nev: user.value.username, 
-        versenyzoId: competitorId 
-      };
-      const putResponse = await axios.put(
-        `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${user.value.id}`,
-        updatedUser
-      );
-
-      if (putResponse.status === 204) {
-        user.value = { ...user.value, competitorId };
-        sessionStorage.setItem("user", JSON.stringify(user.value));
-        message.value = "Azonosítás sikeres!";
-        success.value = true;
-        tajszam.value = "";
-      } else {
-        message.value = "Azonosítás sikertelen, próbáld újra!";
-        success.value = false;
-      }
+      user.value.versenyzoId = response.data.versenyzoId; 
+      sessionStorage.setItem("user", JSON.stringify(user.value));
+      message.value = "Azonosítás sikeres!";
+      success.value = true;
+      tajszam.value = "";
     } else {
-      message.value = "Hibás TAJ szám, kérlek próbáld újra!";
+      message.value = "Azonosítás sikertelen, próbáld újra!";
       success.value = false;
     }
   } catch (error) {
@@ -189,6 +179,7 @@ export default {
     success.value = false;
   }
 };
+
 
 const statistics = ref(null);
 
