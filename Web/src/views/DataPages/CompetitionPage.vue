@@ -83,6 +83,6 @@ h1 {
   font-size: 3em;
 }
 img{
-  /* width: 10em; */
+  width: 10em;
 }
 </style>

@@ -103,8 +103,31 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 export default {
+  setup() {
+    const user = ref(null);
+    const isAuthorized = ref(false);
+    const router = useRouter();
+    
+    const loadUserData = () => {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            user.value = {
+                apiKey: parsedUser.apiKey,
+            };
+            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        } else {
+            router.push("/login");
+        }
+    };
+
+    loadUserData();
+  },
   data() {
     return {
       results: [],

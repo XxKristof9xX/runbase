@@ -118,7 +118,6 @@ export default {
     };
 
     loadUserData();
-    axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
     const loadCompetitions = async () => {
       try {
         const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek");
