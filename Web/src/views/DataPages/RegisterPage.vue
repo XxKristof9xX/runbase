@@ -42,7 +42,6 @@
         this.errorMessage = "";
         this.successMessage = "";
   
-        // ✅ Felhasználónév és jelszó hosszának ellenőrzése
         if (this.form.username.length < 6) {
           this.errorMessage = "A felhasználónévnek legalább 6 karakter hosszúnak kell lennie!";
           return;
