@@ -112,40 +112,40 @@ export default {
     const success = ref(false);
 
     const loadUserData = () => {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = {
-          id: parsedUser.id,
-          username: parsedUser.nev,
-          type: parsedUser.tipus,
-          competitorId: parsedUser.versenyzoId,
-          apiKey: parsedUser.apiKey,
-        };
-        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
-      } else {
-        router.push("/login");
-      }
+  const storedUser = sessionStorage.getItem("user");
+  if (storedUser) {
+    const parsedUser = JSON.parse(storedUser);
+    user.value = {
+      id: parsedUser.id,
+      username: parsedUser.nev,
+      type: parsedUser.tipus,
+      competitorId: parsedUser.versenyzoId,
+      apiKey: parsedUser.apiKey,
     };
+    axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+  } else {
+    router.push("/login");
+  }
+};
     
-    const fetchCompetitorData = async () => {
-      if (!user.value.competitorId) return;
-      try {
-        const [competitorResponse, resultsResponse] = await Promise.all([
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
-          axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`),
-        ]);
-         
-        competitorName.value = competitorResponse.data.nev;
-        competitionResults.value = resultsResponse.data;
-      } catch (error) {
-        console.error("Hiba történt az adatok lekérésekor:", error);
-        competitorName.value = "Ismeretlen versenyző";
-        competitionResults.value = [];
-      }
-    };
+const fetchCompetitorData = async () => {
+  if (!user.value.competitorId) return;
+  try {
+    const [competitorResponse, resultsResponse] = await Promise.all([
+      axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
+      axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`),
+    ]);
 
-    const identifyCompetitor = async () => {
+    competitorName.value = competitorResponse.data.nev;
+    competitionResults.value = resultsResponse.data;
+  } catch (error) {
+    console.error("Hiba történt az adatok lekérésekor:", error);
+    competitorName.value = "Ismeretlen versenyző";
+    competitionResults.value = [];
+  }
+};
+
+const identifyCompetitor = async () => {
   if (!tajszam.value) {
     message.value = "Kérlek, add meg a TAJ számot!";
     success.value = false;
@@ -157,15 +157,20 @@ export default {
       `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/addVersenyzo`,
       {
         tajSzam: tajszam.value,
-        felhasznaloId: user.value.id
+        felhasznaloId: user.value.id,
       }
     );
 
-    console.log("API válasz:", response.data);
-
     if (response.status === 200 && response.data.versenyzoId) {
-      user.value.versenyzoId = response.data.versenyzoId; 
+      user.value = {
+        id: user.value.id,
+        username: user.value.username,
+        apiKey: user.value.apiKey,
+        competitorId: response.data.versenyzoId,
+        type: "competitor",
+      };
       sessionStorage.setItem("user", JSON.stringify(user.value));
+
       message.value = "Azonosítás sikeres!";
       success.value = true;
       tajszam.value = "";
@@ -179,6 +184,7 @@ export default {
     success.value = false;
   }
 };
+
 
 
 const statistics = ref(null);
