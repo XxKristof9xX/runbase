@@ -169,7 +169,7 @@ const identifyCompetitor = async () => {
         competitorId: response.data.versenyzoId,
         type: "competitor",
       };
-      sessionStorage.setItem("user", JSON.stringify(user.value));
+      sessionStorage.setItem("user", JSON.stringify(user));
 
       message.value = "Azonosítás sikeres!";
       success.value = true;
@@ -184,7 +184,6 @@ const identifyCompetitor = async () => {
     success.value = false;
   }
 };
-
 
 
 const statistics = ref(null);
