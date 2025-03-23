@@ -12,6 +12,7 @@
     "@popperjs/core": "^2.11.5",
     "axios": "^1.7.8",
     "bootstrap": "^5.1.3",
+    "chart.js": "^4.4.8",
     "core-js": "^3.8.3",
     "manipula": "^1.3.14",
     "popper.js": "^1.16.1",
