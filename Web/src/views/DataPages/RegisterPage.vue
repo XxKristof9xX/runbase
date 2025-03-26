@@ -47,6 +47,7 @@
           return;
         }
         if (this.form.password.length < 8) {
+          
           this.errorMessage = "A jelszónak legalább 8 karakter hosszúnak kell lennie!";
           return;
         }
