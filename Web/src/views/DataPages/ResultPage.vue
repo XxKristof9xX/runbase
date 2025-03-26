@@ -88,8 +88,9 @@
             <th>
               <input
                 type="button"
+                @click="sortedByRunTime()"
                 class="btn btn-light"
-                value="Eltelt idő (perc)"
+                value="Eltelt idő"
               />
             </th>
           </tr>
@@ -282,6 +283,14 @@ export default {
       }
       this.ascDesc += 1;
     },
+    sortedByRunTime() {
+      if (this.ascDesc % 2 == 0) {
+        this.competitionResults.sort((a, b) => a.difference_minutes - b.difference_minutes);
+      } else {
+        this.competitionResults.sort((a, b) => b.difference_minutes - a.difference_minutes);
+      }
+      this.ascDesc += 1;
+    },
     renderChart() {
     const ctx = document.getElementById('myChart');
     if (!ctx) {
@@ -333,7 +342,7 @@ export default {
         data: {
             labels: binLabels,
             datasets: [{
-                label: 'Eltelt idő (perc)',
+                label: 'Adott intervallumokba eső futók darabszáma',
                 data: binCounts,
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -349,7 +358,7 @@ export default {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Frequency'
+                        text: 'Mennyiség'
                     }
                 },
                 x: {
