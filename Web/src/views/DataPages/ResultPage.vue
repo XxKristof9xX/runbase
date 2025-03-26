@@ -364,7 +364,7 @@ export default {
                 x: {
                     title: {
                         display: true,
-                        text: 'Time (minutes)'
+                        text: 'Futott idő (perc)'
                     }
                 }
             }

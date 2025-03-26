@@ -83,6 +83,9 @@
             <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}.
           </p>
           <p><strong>Adott versenykategóriában elindult versenyzők:</strong> {{ statistics.total }}</p>
+          <p><strong>Medián idő:</strong> {{ statistics.median }} perc</p>
+          <p><strong>Versenyző idő:</strong> {{ Math.round(statistics.competitorTime*100)/100 }} perc</p>
+          <p><strong>Versenyző tempója:</strong> {{ Math.round(statistics.competitorPace*100)/100 }} perc/km</p>
               </div>
             </div>
           </div>
@@ -241,15 +244,17 @@ const calculateStatistics = async (raceId, distanceId) => {
       return;
     }
 
-    const competitorTime =
-      new Date(competitorResult.erkezes) - new Date(competitorResult.indulas);
+    const competitorTime = (new Date(`${alapDatum}T${competitorResult.erkezes}`) - new Date(`${alapDatum}T${competitorResult.indulas}`))/60000;
 
     const competitorPace = competitorTime / competitorResult.tav;
+    
 
     statistics.value = {
       rank,
       total: allResultsInCategory.length,
-      median
+      median,
+      competitorTime,
+      competitorPace,
     };
   } catch (error) {
     console.error("Hiba a statisztika számításakor:", error);
