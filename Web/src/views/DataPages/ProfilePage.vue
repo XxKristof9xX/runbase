@@ -222,14 +222,12 @@ const calculateStatistics = async (raceId, distanceId) => {
     const mid2 = allResultsInCategory[allResultsInCategory.length/2];
     median = (mid1 + mid2) / 2;
   } else {
-  median = allResultsInCategory[Math.floor(allResultsInCategory.length+1/2)];
+    median = allResultsInCategory[Math.floor(allResultsInCategory.length+1/2)];
   }
-
-
-
     const filteredResults = allResults.filter(
       (r) => r.versenyId === raceId && r.tav === distanceId
     );
+    console.log(median);
 
     if (!filteredResults.length) {
       statistics.value = null;
