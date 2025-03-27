@@ -1,39 +1,40 @@
 <template>
   <div id="app">
-    <!-- Navigációs sáv -->
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <router-link to="/" class="navbar-brand">
           <img src="../Images/RunBase_full_logo.png" alt="RunBase Logo" />
         </router-link>
-        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <button
+          type="button"
+          class="navbar-toggler"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+          @click="toggleMenu"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="collapse navbar-collapse" id="navbarCollapse" ref="navbarCollapse">
           <div class="navbar-nav">
-            <router-link to="/" class="nav-item nav-link">Főoldal</router-link>
-            <router-link to="/versenyek" class="nav-item nav-link">Versenyek</router-link>
-            <router-link to="/eredmenyek" class="nav-item nav-link">Eredmények</router-link>
-            <router-link to="/kapcsolat" class="nav-item nav-link">Kapcsolat</router-link>
+            <router-link to="/" class="nav-item nav-link" @click="closeMenu">Főoldal</router-link>
+            <router-link to="/versenyek" class="nav-item nav-link" @click="closeMenu">Versenyek</router-link>
+            <router-link to="/eredmenyek" class="nav-item nav-link" @click="closeMenu">Eredmények</router-link>
+            <router-link to="/kapcsolat" class="nav-item nav-link" @click="closeMenu">Kapcsolat</router-link>
           </div>
-
           <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
-            <router-link to="/adminPage" class="nav-item nav-link">Admin Panel</router-link>
-            <router-link to="/competitionModify" class="nav-item nav-link">Verseny Módosítás</router-link>
+            <router-link to="/adminPage" class="nav-item nav-link" @click="closeMenu">Admin Panel</router-link>
+            <router-link to="/competitionModify" class="nav-item nav-link" @click="closeMenu">Verseny Módosítás</router-link>
           </div>
-
           <div class="navbar-nav ms-auto">
             <template v-if="isLoggedIn">
-              <router-link to="/profil" class="nav-item nav-link">Profil</router-link>
+              <router-link to="/profil" class="nav-item nav-link" @click="closeMenu">Profil</router-link>
               <button class="btn btn-danger nav-item nav-link" @click="logout">Kijelentkezés</button>
             </template>
-            <router-link v-else to="/login" class="nav-item nav-link">Bejelentkezés</router-link>
+            <router-link v-else to="/login" class="nav-item nav-link" @click="closeMenu">Bejelentkezés</router-link>
           </div>
         </div>
       </div>
     </nav>
-
-    <!-- Tartalom -->
     <router-view />
   </div>
 </template>
@@ -41,19 +42,21 @@
 <script>
 import { useRouter } from "vue-router";
 import { ref, onMounted, computed } from "vue";
+import { Collapse } from "bootstrap";
 
 export default {
   setup() {
     const router = useRouter();
     const isLoggedIn = ref(false);
     const userRole = ref(null);
+    const navbarCollapse = ref(null);
 
     const checkLoginStatus = () => {
       const user = sessionStorage.getItem("user");
       if (user) {
         const parsedUser = JSON.parse(user);
         isLoggedIn.value = true;
-        userRole.value = parsedUser.tipus; // Olvassa közvetlenül a sessionStorage-ból
+        userRole.value = parsedUser.tipus;
       } else {
         isLoggedIn.value = false;
         userRole.value = null;
@@ -64,6 +67,16 @@ export default {
       checkLoginStatus();
     };
 
+    const closeMenu = () => {
+      if (window.innerWidth < 992) {
+        const menu = document.getElementById("navbarCollapse");
+        if (menu) {
+          const bsCollapse = Collapse.getInstance(menu) || new Collapse(menu, { toggle: false });
+          bsCollapse.hide();
+        }
+      }
+    };
+
     window.addEventListener("loginStatusChanged", updateLoginStatus);
     onMounted(checkLoginStatus);
 
@@ -72,9 +85,9 @@ export default {
       checkLoginStatus();
       window.dispatchEvent(new Event("loginStatusChanged"));
       router.push("/");
+      closeMenu();
     };
 
-    // Admin vagy szervező jogosultság ellenőrzése
     const isAdminOrOrganizer = computed(() => {
       return userRole.value === "admin" || userRole.value === "organizer";
     });
@@ -82,11 +95,14 @@ export default {
     return { 
       isLoggedIn, 
       isAdminOrOrganizer, 
-      logout 
+      logout,
+      closeMenu
     };
   },
 };
 </script>
+
+
 
 <style>
 #app {
@@ -103,6 +119,7 @@ body {
 
 nav {
   background-color: #20283F;
+  padding: 10px 0;
 }
 
 .navbar-nav {
@@ -110,6 +127,10 @@ nav {
   align-items: center;
 }
 
+.navbar-brand img {
+  width: 7em;
+  margin-bottom: 5px;
+}
 nav a {
   color: rgb(10, 139, 190) !important;
   text-decoration: none;
@@ -125,18 +146,6 @@ nav a:hover {
   color: #00bfff;
 }
 
-img {
-  width: 7em;
-  margin-bottom: 13px;
-  float: left;
-}
-
-#login {
-  border: 2px solid white;
-  border-radius: 5px;
-  background-color: #6F8FAF;
-}
-
 .nav-item.nav-link {
   padding: 10px 15px;
   border-radius: 5px;
@@ -144,5 +153,22 @@ img {
 
 .btn-danger {
   margin-left: 10px;
+}
+@media (max-width: 991px) {
+  .navbar-toggler {
+    border: none !important;
+  }
+
+  .navbar-toggler-icon {
+    filter: invert(100%);
+  }
+
+  .navbar-nav {
+    width: 100%;
+    text-align: center;
+  }
+  .nav-item {
+    margin-bottom: 10px;
+  }
 }
 </style>

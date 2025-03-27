@@ -5,8 +5,6 @@ import "./assets/style.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 import "bootstrap/dist/js/bootstrap.js";
-
-// Vuetify
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
