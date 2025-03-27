@@ -1,7 +1,9 @@
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
-    <v-card class="pa-6" max-width="400">
-      <v-card-title class="text-h5 text-center">Bejelentkezés</v-card-title>
+    <v-card class="pa-10" max-width="800" elevation="10">
+      <v-card-title class="text-h3 text-center font-weight-bold">
+        Bejelentkezés
+      </v-card-title>
 
       <v-card-text>
         <v-form @submit.prevent="login">
@@ -10,29 +12,34 @@
             label="Felhasználónév"
             outlined
             dense
+            class="mb-5"
             required
           ></v-text-field>
+
           <v-text-field
             v-model="form.password"
             label="Jelszó"
             type="password"
             outlined
             dense
+            class="mb-5"
             required
           ></v-text-field>
-          <v-alert v-if="errorMessage" type="error" dense class="mb-3">
+          <v-alert v-if="errorMessage" type="error" dense class="mb-5">
             {{ errorMessage }}
           </v-alert>
 
-          <v-btn type="submit" color="primary" block class="mb-3">
+          <v-btn type="submit" color="primary" block class="mb-5" height="55">
             Bejelentkezés
           </v-btn>
-        </v-form>
 
-        <p class="text-center">
-          Még nincs fiókja?
-          <router-link to="/registration" class="text-primary">Regisztráljon itt</router-link>
-        </p>
+          <p class="text-center text-body-1">
+            Még nincs fiókja?
+            <router-link to="/registration" class="text-primary">
+              Regisztráljon itt
+            </router-link>
+          </p>
+        </v-form>
       </v-card-text>
     </v-card>
   </v-container>
@@ -93,8 +100,3 @@ export default {
   },
 };
 </script>
-<style>
-h1 {
-  font-size: 3em;
-}
-</style>
