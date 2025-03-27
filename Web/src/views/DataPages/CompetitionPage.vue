@@ -103,7 +103,7 @@ export default {
 }
 
 .card-body {
-  height: 200px;
+  height: 250px;
 }
 
 .row {

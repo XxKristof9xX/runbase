@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
-    <v-card class="pa-10" max-width="800" elevation="10">
-      <v-card-title class="text-h3 text-center font-weight-bold">
+    <v-card class="pa-10" width="100%" max-width="700" elevation="10">
+      <v-card-title class="text-h3 text-md-h3 text-center font-weight-bold">
         Regisztráció
       </v-card-title>
 
@@ -13,7 +13,6 @@
             outlined
             dense
             class="mb-5"
-            :rules="[rules.minLength(6)]"
             required
           ></v-text-field>
 
@@ -24,7 +23,6 @@
             outlined
             dense
             class="mb-5"
-            :rules="[rules.minLength(8)]"
             required
           ></v-text-field>
 
@@ -48,6 +46,7 @@
     </v-card>
   </v-container>
 </template>
+
 
 <script>
 import axios from "axios";

@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
-    <v-card class="pa-10" max-width="800" elevation="10">
-      <v-card-title class="text-h3 text-center font-weight-bold">
+    <v-card class="pa-10" width="100%" max-width="700" elevation="10">
+      <v-card-title class="text-h3 text-md-h3 text-center font-weight-bold">
         Bejelentkezés
       </v-card-title>
 
@@ -33,12 +33,9 @@
             Bejelentkezés
           </v-btn>
 
-          <p class="text-center text-body-1">
-            Még nincs fiókja?
-            <router-link to="/registration" class="text-primary">
-              Regisztráljon itt
-            </router-link>
-          </p>
+          <v-btn to="/registration" color="secondary" block height="55">
+            Regisztráció
+          </v-btn>
         </v-form>
       </v-card-text>
     </v-card>
