@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex justify-center align-center">
     <v-card class="pa-10" width="100%" max-width="700" elevation="10">
-      <v-card-title class="text-h3 text-md-h3 text-center font-weight-bold">
+      <v-card-title class="text-h5 text-md-h3 text-sm-h4 text-center font-weight-bold">
         Bejelentkezés
       </v-card-title>
 
