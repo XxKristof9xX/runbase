@@ -1,34 +1,41 @@
 <template>
-  <h1 class="my-3">Bejelentkezés</h1>
-  <div class="container">
-    <div class="row">
-      <form @submit.prevent="login">
-        <div class="form-outline mb-4">
-          <input type="text" id="username" class="form-control" v-model="form.username" required />
-          <label class="form-label" for="username">Felhasználónév</label>
-        </div>
+  <v-container class="fill-height d-flex justify-center align-center">
+    <v-card class="pa-6" max-width="400">
+      <v-card-title class="text-h5 text-center">Bejelentkezés</v-card-title>
 
-        <div class="form-outline mb-4">
-          <input type="password" id="password" class="form-control" v-model="form.password" required />
-          <label class="form-label" for="password">Jelszó</label>
-        </div>
+      <v-card-text>
+        <v-form @submit.prevent="login">
+          <v-text-field
+            v-model="form.username"
+            label="Felhasználónév"
+            outlined
+            dense
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="form.password"
+            label="Jelszó"
+            type="password"
+            outlined
+            dense
+            required
+          ></v-text-field>
+          <v-alert v-if="errorMessage" type="error" dense class="mb-3">
+            {{ errorMessage }}
+          </v-alert>
 
-        <div class="form-check mb-4">
-          <input class="form-check-input" type="checkbox" id="rememberMe" v-model="form.remember" />
-          <label class="form-check-label" for="rememberMe">Emlékezzen rám</label>
-        </div>
-
-        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-        <button type="submit" class="btn btn-primary btn-block mb-4">Bejelentkezés</button>
+          <v-btn type="submit" color="primary" block class="mb-3">
+            Bejelentkezés
+          </v-btn>
+        </v-form>
 
         <p class="text-center">
-          Még nincs fiókja? 
+          Még nincs fiókja?
           <router-link to="/registration" class="text-primary">Regisztráljon itt</router-link>
         </p>
-      </form>
-    </div>
-  </div>
+      </v-card-text>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -61,20 +68,19 @@ export default {
           }
         );
 
-        if (response.data && response.data.apiKey && response.data.user) {
-  window.alert("Sikeres bejelentkezés!");
+        if (response.data?.apiKey && response.data?.user) {
+          window.alert("Sikeres bejelentkezés!");
 
-  const apiKey = response.data.apiKey;
-  const userData = {
-    id: response.data.user.id,
-    nev: response.data.user.nev,
-    tipus: response.data.user.tipus,
-    versenyzoId: response.data.user.versenyzoId,
-    apiKey: apiKey,
-  };
+          const userData = {
+            id: response.data.user.id,
+            nev: response.data.user.nev,
+            tipus: response.data.user.tipus,
+            versenyzoId: response.data.user.versenyzoId,
+            apiKey: response.data.apiKey,
+          };
 
-  sessionStorage.setItem("user", JSON.stringify(userData));
-  window.dispatchEvent(new Event("loginStatusChanged"));
+          sessionStorage.setItem("user", JSON.stringify(userData));
+          window.dispatchEvent(new Event("loginStatusChanged"));
 
           this.$router.push("/");
         } else {
@@ -87,9 +93,3 @@ export default {
   },
 };
 </script>
-
-<style>
-h1 {
-  font-size: 3em;
-}
-</style>
