@@ -101,9 +101,6 @@ export default {
   },
 };
 </script>
-
-
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -153,6 +150,7 @@ nav a:hover {
 
 .btn-danger {
   margin-left: 10px;
+  color: white !important;
 }
 @media (max-width: 991px) {
   .navbar-toggler {
