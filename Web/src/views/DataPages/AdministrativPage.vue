@@ -135,7 +135,7 @@ export default {
     const showEditCompetitorDialog = ref(false);
     const selectedUser = ref({});
     const selectedCompetitor = ref({});
-    const userTypes = ["user","competitor","organizer","administrator"];
+    const userTypes = ["user","competitor","organizer","admin"];
     const genderOptions = ["Férfi", "Nő"];
 
     const userHeaders = [
