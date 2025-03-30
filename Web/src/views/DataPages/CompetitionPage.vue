@@ -19,7 +19,7 @@
     <v-row justify="center" v-else>
       <v-col v-for="c in competitions" :key="c.id" cols="12" sm="6" md="4" lg="3">
         <v-card>
-          <v-img height="400px" v-if="c.kep" :src="getImage(c.kep)" cover></v-img>
+          <v-img v-if="c.kep" :src="getImage(c.kep)" cover></v-img>
           <v-card-title class="text-center">{{ c.nev }}</v-card-title>
           <v-card-actions>
             <v-btn 
@@ -77,3 +77,10 @@ export default {
 }
 };
 </script>
+<style>
+v-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+</style>
