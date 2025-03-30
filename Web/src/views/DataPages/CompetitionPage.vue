@@ -19,10 +19,10 @@
     <v-row justify="center" v-else>
       <v-col v-for="c in competitions" :key="c.id" cols="12" sm="6" md="4" lg="3">
         <v-card>
-          <v-img v-if="c.kep" max-height="400px" :src="getImage(c.kep)" cover></v-img>
+          <v-img v-if="c.kep" :src="getImage(c.kep)" cover></v-img>
           <v-card-title class="text-center">{{ c.nev }}</v-card-title>
           <v-card-actions>
-            <v-btn 
+            <v-btn
               color="primary" 
               :to="{
                 name: 'CompetitionDetails',
