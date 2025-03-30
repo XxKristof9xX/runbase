@@ -1,73 +1,67 @@
 <template>
   <h1 class="my-3 text-center">Versenyek</h1>
-  <div class="container">
-    <div class="row justify-content-center" v-if="loading">
-      <div class="card mx-2 my-3" style="width: 18rem;" v-for="i in 6" :key="i">
-        <div class="card-header text-center">
-          <div class="skeleton-header"></div>
-        </div>
-        <div class="card-body text-center d-flex flex-column justify-content-center">
-          <div class="skeleton-image"></div>
-        </div>
-        <div class="card-footer text-center">
-          <div class="skeleton-button"></div>
-        </div>
-      </div>
-    </div>
-    <div class="row justify-content-center" v-else>
-      <div
-        class="card mx-2 my-3"
-        style="width: 18rem;"
-        v-for="c in competitions"
-        :key="c.id"
-      >
-        <div class="card-header text-center">
-          <h2 class="card-title">{{ c.nev }}</h2>
-        </div>
-        <div class="card-body text-center d-flex flex-column justify-content-center">
-          <img
-            class="img-fluid"
-            src="../../assets/Futoverseny_logo_pelda.jpg"
-            alt="Verseny logó"
-          />
-        </div>
-        <div class="card-footer text-center">
-          <router-link
-            :to="{
-              name: 'CompetitionDetails',
-              params: { nev: c.nev },
-              query: {
-                helyszin: c.helyszin,
-                datum: c.datum,
-                leiras: c.leiras,
-                max_letszam: c.maxLetszam,
-              },
-            }"
-          >
-            <span class="btn btn-info">További információk</span>
-          </router-link>
-        </div>
-      </div>
-    </div>
-  </div>
+  <v-container>
+    <v-row justify="center" v-if="loading">
+      <v-col v-for="i in 6" :key="i" cols="12" sm="6" md="4" lg="3">
+        <v-card>
+          <v-card-title class="text-center">
+            <v-skeleton-loader type="text"></v-skeleton-loader>
+          </v-card-title>
+          <v-card-text class="d-flex justify-center">
+            <v-skeleton-loader type="image"></v-skeleton-loader>
+          </v-card-text>
+          <v-card-actions class="justify-center">
+            <v-skeleton-loader type="button"></v-skeleton-loader>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row justify="center" v-else>
+      <v-col v-for="c in competitions" :key="c.id" cols="12" sm="6" md="4" lg="3">
+        <v-card>
+          <v-img height="400px" v-if="c.kep" :src="getImage(c.kep)" cover></v-img>
+          <v-card-title class="text-center">{{ c.nev }}</v-card-title>
+          <v-card-actions>
+            <v-btn 
+              color="primary" 
+              :to="{
+                name: 'CompetitionDetails',
+                params: { nev: c.nev },
+                query: {
+                  helyszin: c.helyszin,
+                  datum: c.datum,
+                  leiras: c.leiras,
+                  max_letszam: c.maxLetszam,
+                  kep: c.kep,
+                },
+              }"
+            >
+              További információk
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
   <router-view />
 </template>
 
 <script>
 import axios from "axios";
+import FutoVersenyLogo from "@/assets/Futoverseny_logo_pelda.jpg";
 
 export default {
   data() {
     return {
       competitions: [],
       loading: true,
+      futoVersenyLogo: FutoVersenyLogo,
     };
   },
   created() {
     axios
       .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
       .then((response) => {
-        console.log(response.data);
         this.competitions = response.data;
         this.loading = false;
       })
@@ -76,80 +70,10 @@ export default {
         this.loading = false;
       });
   },
+  methods: {
+  getImage(base64Data) {
+    return `data:image/jpeg;base64,${base64Data}`;
+  }
+}
 };
 </script>
-
-<style scoped>
-.card {
-  border-color: #20283f;
-  padding: 0;
-}
-
-.card-header {
-  background-color: #add8e6;
-  height: 8em; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0.5em;
-}
-
-.card-title {
-  margin: 0;
-  padding: 0;
-  font-size: 1.2rem;
-  word-break: break-word;
-}
-
-.card-body {
-  height: 250px;
-}
-
-.row {
-  margin: 10px;
-}
-
-h1 {
-  font-size: 3em;
-}
-
-img {
-  width: 10em;
-}
-.skeleton-header {
-  width: 80%;
-  height: 30px;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-  border-radius: 5px;
-  animation: skeleton-loading 1.2s linear infinite alternate;
-}
-
-.skeleton-image {
-  width: 8em;
-  height: 8em;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-  border-radius: 50%;
-  animation: skeleton-loading 1.2s linear infinite alternate;
-}
-
-.skeleton-button {
-  width: 60%;
-  height: 35px;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-  border-radius: 5px;
-  animation: skeleton-loading 1.2s linear infinite alternate;
-}
-
-@keyframes skeleton-loading {
-  0% {
-    background-color: #f2f2f2;
-  }
-  100% {
-    background-color: #ddd;
-  }
-}
-</style>
