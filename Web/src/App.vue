@@ -111,7 +111,7 @@ export default {
 }
 
 body {
-  background-color: #ADD8E6;
+  background-color: #ffffff;
 }
 
 nav {
