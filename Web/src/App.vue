@@ -22,6 +22,7 @@
             <router-link to="/" class="nav-item nav-link" @click="closeMenu">Főoldal</router-link>
             <router-link to="/versenyek" class="nav-item nav-link" @click="closeMenu">Versenyek</router-link>
             <router-link to="/eredmenyek" class="nav-item nav-link" @click="closeMenu">Eredmények</router-link>
+            <router-link to="/forum" class="nav-item nav-link" @click="closeMenu">Fórum</router-link>
             <router-link to="/kapcsolat" class="nav-item nav-link" @click="closeMenu">Kapcsolat</router-link>
           </div>
           <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
