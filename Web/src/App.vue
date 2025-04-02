@@ -10,6 +10,9 @@
           class="navbar-toggler"
           data-bs-toggle="collapse"
           data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
           @click="toggleMenu"
         >
           <span class="navbar-toggler-icon"></span>
@@ -49,7 +52,6 @@ export default {
     const router = useRouter();
     const isLoggedIn = ref(false);
     const userRole = ref(null);
-    const navbarCollapse = ref(null);
 
     const checkLoginStatus = () => {
       const user = sessionStorage.getItem("user");
@@ -67,18 +69,36 @@ export default {
       checkLoginStatus();
     };
 
-    const closeMenu = () => {
-      if (window.innerWidth < 992) {
-        const menu = document.getElementById("navbarCollapse");
-        if (menu) {
-          const bsCollapse = Collapse.getInstance(menu) || new Collapse(menu, { toggle: false });
-          bsCollapse.hide();
-        }
+    const toggleMenu = () => {
+      const menu = document.getElementById("navbarCollapse");
+      if (menu) {
+        const bsCollapse = Collapse.getInstance(menu) || new Collapse(menu, { toggle: false });
+        bsCollapse.toggle();
       }
     };
 
+    const closeMenu = () => {
+      const menu = document.getElementById("navbarCollapse");
+      if (menu && menu.classList.contains("show")) {
+        const bsCollapse = Collapse.getInstance(menu) || new Collapse(menu, { toggle: false });
+        bsCollapse.hide();
+      }
+    };
+
+    onMounted(() => {
+      checkLoginStatus();
+
+      // Bezárja a menüt, ha a felhasználó a menün kívülre kattint
+      document.addEventListener("click", (event) => {
+        const menu = document.getElementById("navbarCollapse");
+        if (menu && menu.classList.contains("show") && !menu.contains(event.target)) {
+          const bsCollapse = Collapse.getInstance(menu) || new Collapse(menu, { toggle: false });
+          bsCollapse.hide();
+        }
+      });
+    });
+
     window.addEventListener("loginStatusChanged", updateLoginStatus);
-    onMounted(checkLoginStatus);
 
     const logout = () => {
       sessionStorage.removeItem("user");
@@ -92,15 +112,17 @@ export default {
       return userRole.value === "admin" || userRole.value === "organizer";
     });
 
-    return { 
-      isLoggedIn, 
-      isAdminOrOrganizer, 
+    return {
+      isLoggedIn,
+      isAdminOrOrganizer,
       logout,
-      closeMenu
+      closeMenu,
+      toggleMenu,
     };
   },
 };
 </script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -114,7 +136,7 @@ body {
   background-color: #ffffff;
 }
 
-nav {
+.navbar {
   background-color: #20283F;
   padding: 10px 0;
 }
@@ -128,7 +150,8 @@ nav {
   width: 7em;
   margin-bottom: 5px;
 }
-nav a {
+
+.navbar a {
   color: rgb(10, 139, 190) !important;
   text-decoration: none;
   transition: color 0.3s;
@@ -152,6 +175,7 @@ nav a:hover {
   margin-left: 10px;
   color: white !important;
 }
+
 @media (max-width: 991px) {
   .navbar-toggler {
     border: none !important;
@@ -165,6 +189,7 @@ nav a:hover {
     width: 100%;
     text-align: center;
   }
+  
   .nav-item {
     margin-bottom: 10px;
   }
