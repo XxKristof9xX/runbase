@@ -9,6 +9,7 @@ import Profile from '../views/DataPages/ProfilePage.vue'
 import Register from '../views/DataPages/RegisterPage.vue'
 import AdministrativPage from '@/views/DataPages/AdministrativPage.vue'
 import CompetitionModify from '@/views/DataPages/CompetitionModifyPage.vue'
+import Forum from '@/views/DataPages/ForumPage.vue'
 
 const routes = [
   {
@@ -67,10 +68,12 @@ const routes = [
     path: '/competitionModify',
     name: 'competitionModify',
     component: CompetitionModify
+  },
+  {
+    path: '/forum',
+    name: 'forum',
+    component: Forum
   }
-
-
-
 ]
 
 const router = createRouter({
