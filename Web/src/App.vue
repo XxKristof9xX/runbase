@@ -87,8 +87,6 @@ export default {
 
     onMounted(() => {
       checkLoginStatus();
-
-      // Bezárja a menüt, ha a felhasználó a menün kívülre kattint
       document.addEventListener("click", (event) => {
         const menu = document.getElementById("navbarCollapse");
         if (menu && menu.classList.contains("show") && !menu.contains(event.target)) {

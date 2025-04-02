@@ -1,6 +1,6 @@
 <template>
   <v-container>
- <v-list>
+    <v-list>
       <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
         <v-card class="pa-4">
           <v-card-title>{{ post.felhasznaloNev || 'Ismeretlen felhasználó' }}</v-card-title>
@@ -13,28 +13,25 @@
 
     <v-divider class="my-4"></v-divider>
 
-    <v-card class="pa-4 mb-4">
+    <v-card class="pa-4 mb-4" v-if="user">
       <v-textarea v-model="newPost.tartalom" label="Írd meg a bejegyzésed..." outlined></v-textarea>
       <v-file-input label="Kép feltöltése" accept="image/*" @change="handleFileUpload"></v-file-input>
       <v-btn color="primary" @click="submitPost" :disabled="!newPost.tartalom && !newPost.kep">Küldés</v-btn>
     </v-card>
+    <p v-else class="text-center">Bejelentkezés szükséges a hozzászóláshoz.</p>
   </v-container>
-
 </template>
 
 <script>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const posts = ref([]);
     const newPost = ref({ tartalom: "", kep: null });
     const file = ref(null);
-    const router = useRouter();
     const user = ref(null);
-
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
@@ -46,8 +43,6 @@ export default {
         apiKey: parsedUser.apiKey,
       };
       axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
-    } else {
-      router.push("/login");
     }
 
     const fetchPosts = async () => {
@@ -64,6 +59,10 @@ export default {
     };
 
     const submitPost = async () => {
+      if (!user.value) {
+        alert("Csak bejelentkezett felhasználók posztolhatnak!");
+        return;
+      }
       if (!newPost.value.tartalom) {
         console.error("Hiba: A tartalom nem lehet üres!");
         return;
@@ -98,16 +97,14 @@ export default {
       });
     };
 
-    
-
     onMounted(fetchPosts);
 
-    return { posts, newPost, handleFileUpload, submitPost, formatDate };
+    return { posts, newPost, handleFileUpload, submitPost, formatDate, user };
   },
   methods: {
-  getImage(base64Data) {
-    return `data:image/jpeg;base64,${base64Data}`;
+    getImage(base64Data) {
+      return `data:image/jpeg;base64,${base64Data}`;
+    }
   }
-}
 };
 </script>
