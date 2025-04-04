@@ -1,15 +1,27 @@
 <template>
-  <v-container>
-    <v-list>
-      <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
-        <v-card class="pa-4">
-          <v-card-title>{{ post.felhasznaloNev || 'Ismeretlen felhasználó' }}</v-card-title>
-          <v-card-subtitle>{{ formatDate(post.datum) }}</v-card-subtitle>
-          <v-img v-if="post.kep" :src="getImage(post.kep)" height="200px" contain class="mb-2"></v-img>
-          <v-card-text>{{ post.tartalom }}</v-card-text>
-        </v-card>
-      </v-list-item>
-    </v-list>
+  <v-container class="forum-container">
+    <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
+      <v-card class="forum-post">
+        <div class="post-header">
+          <div class="username">{{ post.felhasznaloNev || 'Ismeretlen felhasználó' }}</div>
+        </div>
+        <div class="post-content">
+          <div class="post-image-wrapper" v-if="post.kep">
+            <v-img
+              :src="getImage(post.kep)"
+              height="300"
+              width="auto"
+              class="post-image"
+              contain
+            ></v-img>
+          </div>
+          <div class="post-text">
+            <div class="post-body">{{ post.tartalom }}</div>
+            <div class="timestamp">{{ formatDate(post.datum) }}</div>
+          </div>
+        </div>
+      </v-card>
+    </v-list-item>
 
     <v-divider class="my-4"></v-divider>
 
@@ -67,7 +79,7 @@ export default {
         console.error("Hiba: A tartalom nem lehet üres!");
         return;
       }
-      
+
       const formData = new FormData();
       formData.append("felhasznaloId", user.value.id);
       formData.append("tartalom", newPost.value.tartalom);
@@ -108,3 +120,71 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.forum-container {
+  border: 1px solid #000;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.forum-post {
+  background-color: #ffffff;
+  border-left: 4px solid #1976d2;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  position: relative;
+}
+
+.post-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.post-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .post-content {
+    flex-direction: row;
+  }
+}
+
+.post-image-wrapper {
+  flex-shrink: 0;
+  max-width: 300px;
+}
+
+.post-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.post-text {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.post-body {
+  white-space: pre-line;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #777;
+  text-align: right;
+  margin-top: auto;
+  align-self: flex-end;
+}
+</style>
