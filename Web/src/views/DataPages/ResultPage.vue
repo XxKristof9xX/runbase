@@ -3,37 +3,27 @@
   <div class="container">
     <div class="row">
       <div class="col-6">
-        <select
-          class="form-select"
-          @change="fillup($event), competitionResult()"
-          Id="selectedCompetition"
-        >
-          <option value="" selected disabled hidden>
-            Válasszon egy versenyt!
-          </option>
-          <option v-for="a in competitions" :key="a.nev" v-bind:value="a.nev">
-            {{ a.nev }}
-          </option>
-        </select>
+        <v-autocomplete
+          v-model="selectedCompetition"
+          :items="competitions.map(c => c.nev)"
+          label="Válasszon egy versenyt!"
+          outlined
+          dense
+          clearable
+          @update:modelValue="onCompetitionChange"
+        />
       </div>
 
       <div class="col-6">
-        <select
-          class="form-select"
-          Id="selectedDistance"
-          @change="competitionResult()"
-        >
-          <option value="" selected disabled hidden>
-            Válasszon egy távot!
-          </option>
-          <option
-            v-for="a in selectedCompetitionDistances"
-            :key="a.tavId"
-            v-bind:value="JSON.stringify(a)"
-          >
-            {{ a.tav }} km
-          </option>
-        </select>
+        <v-autocomplete
+          v-model="selectedDistance"
+          :items="selectedCompetitionDistances.map(d => `${d.tav} km`)"
+          label="Válasszon egy távot!"
+          outlined
+          dense
+          clearable
+          @update:modelValue="competitionResult"
+        />
       </div>
 
       <div class="table-wrapper-scroll-y my-custom-scrollbar mt-2">
@@ -101,16 +91,16 @@
             <td>{{ r.indulas }}</td>
             <td>{{ r.erkezes }}</td>
             <td>{{ r.rajtszam }}</td>
-            <td>{{ Math.round(r.difference_minutes* 100) / 100 }} perc</td>
+            <td>{{ Math.round(r.difference_minutes * 100) / 100 }} perc</td>
           </tr>
         </table>
       </div>
-      
+
     </div>
     <br>
     <div class="chart-container" style="position: relative; height:20vh; width:80vw">
-        <canvas id="myChart"></canvas>
-      </div>
+      <canvas id="myChart"></canvas>
+    </div>
   </div>
 </template>
 
@@ -134,7 +124,7 @@ export default {
         user.value = {
           apiKey: parsedUser.apiKey,
         };
-        isAuthorized.value = ["admin", "organizer","user","competitor"].includes(parsedUser.tipus);
+        isAuthorized.value = ["admin", "organizer", "user", "competitor"].includes(parsedUser.tipus);
         axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
@@ -159,7 +149,9 @@ export default {
       selectedCompetitionDistances: [],
       postCompetitionDistances: [],
       ascDesc: 0,
-      myChart: null
+      myChart: null,
+      selectedCompetition: null,
+      selectedDistance: null,
     };
   },
 
@@ -171,20 +163,20 @@ export default {
           this.results.forEach(result => {
             const indulasTime = result.indulas;
             const erkezesTime = result.erkezes;
-             const alapDatum = "2025-03-11";
+            const alapDatum = "2025-03-11";
             if (!indulasTime || !erkezesTime) {
               console.error("Invalid date found:", indulasTime, erkezesTime);
               result.difference_minutes = NaN;
             } else {
               const startTime = new Date(`${alapDatum}T${indulasTime}`);
               const endTime = new Date(`${alapDatum}T${erkezesTime}`);
-                if (isNaN(startTime) || isNaN(endTime)) {
-                  console.error("Invalid date found:", indulasTime, erkezesTime);
-                  result.difference_minutes = NaN;
-                }
-                else{
-                  result.difference_minutes = (endTime - startTime) / (1000 * 60);
-                }
+              if (isNaN(startTime) || isNaN(endTime)) {
+                console.error("Invalid date found:", indulasTime, erkezesTime);
+                result.difference_minutes = NaN;
+              }
+              else {
+                result.difference_minutes = (endTime - startTime) / (1000 * 60);
+              }
             }
           });
         })
@@ -204,50 +196,35 @@ export default {
     }
   },
   mounted() {
-      this.renderChart();
+    this.renderChart();
   },
   methods: {
-    fillup(event) {
-      document.getElementById("selectedDistance").selectedIndex = 0;
-      this.selectedCompetitionDistances = [];
+    onCompetitionChange() {
+      this.selectedDistance = null;
+      const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
+      if (!selectedComp) return;
 
-      this.competitionDistanceIds = [];
-      this.selectedCompetitionDistances = [];
-      this.competitionDistances.forEach((element) => {
-        if (element.versenyId == event.target.selectedIndex) {
-          this.selectedCompetitionDistances.push(element);
-        }
-      });
+      this.selectedCompetitionDistances = this.competitionDistances.filter(d => d.versenyId === selectedComp.versenyId);
+      this.competitionResult();
     },
 
     competitionResult() {
-    this.competitionResults = [];
-    var selectedDistanceId = 0;
+      this.competitionResults = [];
+      const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
+      if (!selectedComp) return;
 
-    if (document.getElementById("selectedDistance").selectedIndex == 0) {
-        this.results.forEach((element) => {
-            if (
-                element.versenyId ==
-                document.getElementById("selectedCompetition").selectedIndex
-            ) {
-                this.competitionResults.push(element);
-            }
-        });
-    } else {
-        selectedDistanceId = document.getElementById("selectedDistance").value.match(/(\d+)/)[0];
+      const selectedDistanceId = this.selectedDistance
+        ? parseInt(this.selectedDistance.split(" - ")[0])
+        : null;
 
-        this.results.forEach((element) => {
-            if (
-                element.versenyId ==
-                document.getElementById("selectedCompetition").selectedIndex &&
-                element.tav == selectedDistanceId
-            ) {
-                this.competitionResults.push(element);
-            }
-        });
-        this.renderChart();
-         }
-},
+      this.competitionResults = this.results.filter(result => {
+        const isSameCompetition = result.versenyId === selectedComp.versenyId;
+        const isSameDistance = selectedDistanceId ? result.tav === selectedDistanceId : true;
+        return isSameCompetition && isSameDistance;
+      });
+
+      this.renderChart();
+    },
 
     sortedByCompetitionId() {
       if (this.ascDesc % 2 == 0) {
@@ -275,6 +252,7 @@ export default {
       }
       this.ascDesc += 1;
     },
+
     sortedByStartNumber() {
       if (this.ascDesc % 2 == 0) {
         this.competitionResults.sort((a, b) => a.rajtszam - b.rajtszam);
@@ -283,6 +261,7 @@ export default {
       }
       this.ascDesc += 1;
     },
+
     sortedByRunTime() {
       if (this.ascDesc % 2 == 0) {
         this.competitionResults.sort((a, b) => a.difference_minutes - b.difference_minutes);
@@ -291,94 +270,94 @@ export default {
       }
       this.ascDesc += 1;
     },
+
     renderChart() {
-    const ctx = document.getElementById('myChart');
-    if (!ctx) {
+      const ctx = document.getElementById('myChart');
+      if (!ctx) {
         console.error("Canvas element with id 'myChart' not found!");
         return;
-    }
+      }
 
-    const chartCtx = ctx.getContext('2d');
-    if (!chartCtx) {
+      const chartCtx = ctx.getContext('2d');
+      if (!chartCtx) {
         console.error("Could not get 2D context for the chart!");
         return;
-    }
+      }
 
-    if (this.competitionResults.length === 0) {
+      if (this.competitionResults.length === 0) {
         if (this.myChart) {
-            this.myChart.destroy();
-            this.myChart = null;
+          this.myChart.destroy();
+          this.myChart = null;
         }
         console.log("No data to render chart.");
         return;
-    }
+      }
 
-    if (this.myChart) {
+      if (this.myChart) {
         this.myChart.destroy();
-    }
+      }
 
-    const timeDifferences = this.competitionResults
+      const timeDifferences = this.competitionResults
         .filter(item => !isNaN(item.difference_minutes))
         .map(item => item.difference_minutes);
-    const numBins = Math.ceil(Math.sqrt(timeDifferences.length));
-    const minTime = Math.min(...timeDifferences);
-    const maxTime = Math.max(...timeDifferences);
-    const binSize = (maxTime - minTime) / numBins;
-    const binCounts = new Array(numBins).fill(0);
+      const numBins = Math.ceil(Math.sqrt(timeDifferences.length));
+      const minTime = Math.min(...timeDifferences);
+      const maxTime = Math.max(...timeDifferences);
+      const binSize = (maxTime - minTime) / numBins;
+      const binCounts = new Array(numBins).fill(0);
 
-    timeDifferences.forEach(time => {
-        const binIndex = Math.floor((time - minTime) / binSize);
+      timeDifferences.forEach(time => {
+        const binIndex = Math.min(Math.floor((time - minTime) / binSize), numBins - 1);
         binCounts[binIndex]++;
-    });
+      });
 
-    const binLabels = binCounts.map((_, index) => {
+      const binLabels = binCounts.map((_, index) => {
         const binStart = minTime + index * binSize;
         const binEnd = binStart + binSize;
         return `${binStart.toFixed(2)} - ${binEnd.toFixed(2)}`;
-    });
+      });
 
-    this.myChart = new Chart(chartCtx, {
+      this.myChart = new Chart(chartCtx, {
         type: 'line',
         data: {
-            labels: binLabels,
-            datasets: [{
-                label: 'Adott intervallumokba eső futók darabszáma',
-                data: binCounts,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                tension: 0.4
-            }]
+          labels: binLabels,
+          datasets: [{
+            label: 'Adott intervallumokba eső futók darabszáma',
+            data: binCounts,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            tension: 0.4
+          }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Mennyiség'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Futott idő (perc)'
-                    }
-                }
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Mennyiség'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Futott idő (perc)'
+              }
             }
+          }
         }
-    });
-}
-
+      });
+    }
   },
 };
 </script>
 
 <style>
 h1 {
-  font-size: 1000px;
+  font-size: 3em;
 }
 
 .my-custom-scrollbar {
@@ -395,11 +374,8 @@ th {
   top: 0;
   background-color: white;
 }
-.post-select{
+.post-select {
   height: 30px !important;
-}
-h1 {
-  font-size: 3em;
 }
 .chart-container {
   width: 100%;
