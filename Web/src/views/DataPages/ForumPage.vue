@@ -1,7 +1,20 @@
 <template>
+<h1 class="my-3">Fórum</h1>
+
   <v-container class="forum-container">
     <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
       <v-card class="forum-post">
+        <!-- A gomb áthelyezve ide, a v-card közvetlen gyermekeként -->
+        <v-btn
+          v-if="user && (user.type === 'admin' || user.type === 'organizer')"
+          icon
+          color="red"
+          class="delete-button"
+          @click="deletePost(post.id)"
+        >
+          <v-icon size="20">mdi-close</v-icon>
+        </v-btn>
+
         <div class="post-header">
           <div class="username">{{ post.felhasznaloNev || 'Ismeretlen felhasználó' }}</div>
         </div>
@@ -33,6 +46,7 @@
     <p v-else class="text-center">Bejelentkezés szükséges a hozzászóláshoz.</p>
   </v-container>
 </template>
+
 
 <script>
 import { ref, onMounted } from "vue";
@@ -109,9 +123,27 @@ export default {
       });
     };
 
+    const deletePost = async (id) => {
+  if (!confirm("Biztosan törlöd ezt a bejegyzést?")) return;
+  try {
+    await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/forum/${id}`);
+    fetchPosts(); // Frissítjük a listát
+  } catch (error) {
+    console.error("Hiba a törlés során:", error);
+  }
+};
+
+
     onMounted(fetchPosts);
 
-    return { posts, newPost, handleFileUpload, submitPost, formatDate, user };
+    return { 
+      posts, 
+      newPost, 
+      handleFileUpload, 
+      submitPost, 
+      formatDate, 
+      user,
+      deletePost};
   },
   methods: {
     getImage(base64Data) {
@@ -148,6 +180,13 @@ export default {
   flex-direction: column;
   gap: 16px;
   align-items: flex-start;
+}
+
+.delete-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
 }
 
 @media (min-width: 768px) {

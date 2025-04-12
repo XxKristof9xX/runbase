@@ -23,7 +23,6 @@
 </template>
 
 <script>
-//import LoginPageVue from './DataPages/LoginPage.vue';
 export default {
   components: {
   },
