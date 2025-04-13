@@ -3,6 +3,7 @@
     <div v-if="isAuthorized">
       <h1>Admin Panel</h1>
       
+      <!-- Felhasználók kezelése -->
       <div v-if="isAdmin" class="mt-4">
         <h2>Felhasználók kezelése</h2>
         <v-text-field v-model="searchUsers" label="Keresés..." class="mb-4" clearable></v-text-field>
@@ -18,15 +19,51 @@
               <td>{{ item.id }}</td>
               <td>{{ item.nev }}</td>
               <td>{{ item.tipus }}</td>
-              <td>
-                <v-btn color="warning" size="small" @click="editUser(item)">Módosítás</v-btn>
-                <v-btn color="error" size="small" class="ml-2" @click="deleteUser(item.id)">Törlés</v-btn>
+              <td class="d-flex align-center">
+                <!-- Nagy kijelzőn szöveges gomb -->
+                <v-btn
+                  v-show="$vuetify.display.mdAndUp"
+                  color="warning"
+                  size="small"
+                  @click="editUser(item)"
+                >
+                  Módosítás
+                </v-btn>
+                <v-btn
+                  v-show="$vuetify.display.mdAndUp"
+                  color="error"
+                  size="small"
+                  class="ml-2"
+                  @click="deleteUser(item.id)"
+                >
+                  Törlés
+                </v-btn>
+
+                <!-- Kis kijelzőn ikon -->
+                <v-btn
+                  v-show="$vuetify.display.smAndDown"
+                  icon
+                  color="warning"
+                  @click="editUser(item)"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  v-show="$vuetify.display.smAndDown"
+                  icon
+                  color="error"
+                  class="ml-2"
+                  @click="deleteUser(item.id)"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </td>
             </tr>
           </template>
         </v-data-table>
       </div>
 
+      <!-- Versenyzők kezelése -->
       <div v-if="isAdminOrOrganizer" class="mt-4">
         <h2>Versenyzők kezelése</h2>
         <v-text-field v-model="searchCompetitors" label="Keresés..." class="mb-4" clearable></v-text-field>
@@ -42,9 +79,44 @@
               <td>{{ item.versenyzoId }}</td>
               <td>{{ item.nev }}</td>
               <td>{{ item.tajSzam }}</td>
-              <td>
-                <v-btn color="warning" size="small" @click="editCompetitor(item)">Módosítás</v-btn>
-                <v-btn color="error" size="small" class="ml-2" @click="deleteCompetitor(item.versenyzoId)">Törlés</v-btn>
+              <td class="d-flex align-center">
+                <!-- Nagy kijelzőn szöveges -->
+                <v-btn
+                  v-show="$vuetify.display.mdAndUp"
+                  color="warning"
+                  size="small"
+                  @click="editCompetitor(item)"
+                >
+                  Módosítás
+                </v-btn>
+                <v-btn
+                  v-show="$vuetify.display.mdAndUp"
+                  color="error"
+                  size="small"
+                  class="ml-2"
+                  @click="deleteCompetitor(item.versenyzoId)"
+                >
+                  Törlés
+                </v-btn>
+
+                <!-- Kis kijelzőn ikon -->
+                <v-btn
+                  v-show="$vuetify.display.smAndDown"
+                  icon
+                  color="warning"
+                  @click="editCompetitor(item)"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn
+                  v-show="$vuetify.display.smAndDown"
+                  icon
+                  color="error"
+                  class="ml-2"
+                  @click="deleteCompetitor(item.versenyzoId)"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </td>
             </tr>
           </template>
