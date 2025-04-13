@@ -28,81 +28,87 @@
 
       <div class="table-wrapper-scroll-y my-custom-scrollbar mt-2">
         <table class="table mt-3">
-          <tr>
-            <th>
-              <input
-                type="button"
-                @click="sortedByCompetitionId()"
-                class="btn btn-light"
-                value="Verseny Azonosító"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                @click="sortedByDistanceId()"
-                class="btn btn-light"
-                value="Távok"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                @click="sortedByNameId()"
-                class="btn btn-light"
-                value="Versenyző Azonosító"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                class="btn btn-light"
-                value="Indulási Idő"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                class="btn btn-light"
-                value="Érkezési Idő"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                @click="sortedByStartNumber()"
-                class="btn btn-light"
-                value="Rajtszám"
-              />
-            </th>
-            <th>
-              <input
-                type="button"
-                @click="sortedByRunTime()"
-                class="btn btn-light"
-                value="Eltelt idő"
-              />
-            </th>
-          </tr>
-          <tr v-for="r in competitionResults" :key="r.Id">
-            <td>{{ r.versenyId }}</td>
-            <td>{{ r.tav }} km</td>
-            <td>{{ r.versenyzoId }}</td>
-            <td>{{ r.indulas }}</td>
-            <td>{{ r.erkezes }}</td>
-            <td>{{ r.rajtszam }}</td>
-            <td>{{ Math.round(r.difference_minutes * 100) / 100 }} perc</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="button"
+                  @click="sortedByCompetitionId()"
+                  class="btn btn-light"
+                  value="Verseny Azonosító"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  @click="sortedByDistanceId()"
+                  class="btn btn-light"
+                  value="Távok"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  @click="sortedByNameId()"
+                  class="btn btn-light"
+                  value="Versenyző Azonosító"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  class="btn btn-light"
+                  value="Indulási Idő"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  class="btn btn-light"
+                  value="Érkezési Idő"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  @click="sortedByStartNumber()"
+                  class="btn btn-light"
+                  value="Rajtszám"
+                />
+              </th>
+              <th>
+                <input
+                  type="button"
+                  @click="sortedByRunTime()"
+                  class="btn btn-light"
+                  value="Eltelt idő"
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in competitionResults" :key="r.Id">
+              <td>{{ r.versenyId }}</td>
+              <td>{{ r.tav }} km</td>
+              <td>{{ r.versenyzoId }}</td>
+              <td>{{ r.indulas }}</td>
+              <td>{{ r.erkezes }}</td>
+              <td>{{ r.rajtszam }}</td>
+              <td>{{ Math.round(r.difference_minutes * 100) / 100 }} perc</td>
+            </tr>
+          </tbody>
         </table>
       </div>
-
     </div>
+
     <br>
+
     <div class="chart-container" style="position: relative; height:20vh; width:80vw">
       <canvas id="myChart"></canvas>
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, onMounted } from "vue";
