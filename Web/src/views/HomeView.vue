@@ -9,14 +9,12 @@
       Jelenleg nincs olyan rendszer, mely eltárolná a futóversenyek eredményeit úgy, hogy elérhető legyen bárki számára.
       Ez a rendszer eltárolná ezeket az adatokat és elérhetővé tenné mindenki számára.
     </p>
-    <p>
-    A szoftver célja: 
-    <ul class="pb-3">
-        <li>A felhasználók megnézhessék az adott versenyeken résztvevő futók eredményeit</li>
-        <li>Eredmények kiemelése, ha az adott felhasználó részt vett valamelyik versenyen</li>
-        <li>Rá jogosult felhasználók módosíthatják és feltölthetik az eredményeket</li>
-    </ul>
-    </p>
+    <p>A szoftver célja:</p>
+<ul class="pb-3">
+  <li>A felhasználók megnézhessék az adott versenyeken résztvevő futók eredményeit</li>
+  <li>Eredmények kiemelése, ha az adott felhasználó részt vett valamelyik versenyen</li>
+  <li>Rá jogosult felhasználók módosíthatják és feltölthetik az eredményeket</li>
+</ul>
       </div>
     </div>
   </div>
