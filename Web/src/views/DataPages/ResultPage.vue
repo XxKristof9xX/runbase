@@ -109,7 +109,7 @@
 
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { Chart, registerables } from 'chart.js';

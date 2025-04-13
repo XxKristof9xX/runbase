@@ -166,15 +166,6 @@ export default {
             router.push("/login");
         }
     };
-
-    const checkUserRole = () => {
-      const user = sessionStorage.getItem("user");
-      if (user) {
-        const parsedUser = JSON.parse(user);
-        
-      }
-    };
-
     const fetchUsers = async () => {
       try {
         const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/");

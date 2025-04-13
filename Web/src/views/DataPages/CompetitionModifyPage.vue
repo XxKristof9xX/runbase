@@ -101,7 +101,6 @@ export default {
     const postCompetitionDistances = ref([]);
     const user = ref(null);
     const isAuthorized = ref(false);
-    const selectedFile = ref(null);
     const router = useRouter();
     
     const loadUserData = () => {
