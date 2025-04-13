@@ -7,24 +7,11 @@
 
       <v-card-text>
         <v-form @submit.prevent="login">
-          <v-text-field
-            v-model="form.username"
-            label="Felhasználónév"
-            outlined
-            dense
-            class="mb-5"
-            required
-          ></v-text-field>
+          <v-text-field v-model="form.username" label="Felhasználónév" outlined dense class="mb-5"
+            required></v-text-field>
 
-          <v-text-field
-            v-model="form.password"
-            label="Jelszó"
-            type="password"
-            outlined
-            dense
-            class="mb-5"
-            required
-          ></v-text-field>
+          <v-text-field v-model="form.password" label="Jelszó" type="password" outlined dense class="mb-5"
+            required></v-text-field>
           <v-alert v-if="errorMessage" type="error" dense class="mb-5">
             {{ errorMessage }}
           </v-alert>

@@ -2,59 +2,28 @@
   <v-container>
     <div v-if="isAuthorized">
       <h1>Admin Panel</h1>
-      
-      <!-- Felhasználók kezelése -->
       <div v-if="isAdmin" class="mt-4">
         <h2>Felhasználók kezelése</h2>
         <v-text-field v-model="searchUsers" label="Keresés..." class="mb-4" clearable></v-text-field>
-        <v-data-table
-          :headers="userHeaders"
-          :items="users"
-          :search="searchUsers"
-          items-per-page="5"
-          class="elevation-1"
-        >
+        <v-data-table :headers="userHeaders" :items="users" :search="searchUsers" items-per-page="5"
+          class="elevation-1">
           <template #item="{ item }">
             <tr>
               <td>{{ item.id }}</td>
               <td>{{ item.nev }}</td>
               <td>{{ item.tipus }}</td>
               <td class="d-flex align-center">
-                <!-- Nagy kijelzőn szöveges gomb -->
-                <v-btn
-                  v-show="$vuetify.display.mdAndUp"
-                  color="warning"
-                  size="small"
-                  @click="editUser(item)"
-                >
+                <v-btn v-show="$vuetify.display.mdAndUp" color="warning" size="small" @click="editUser(item)">
                   Módosítás
                 </v-btn>
-                <v-btn
-                  v-show="$vuetify.display.mdAndUp"
-                  color="error"
-                  size="small"
-                  class="ml-2"
-                  @click="deleteUser(item.id)"
-                >
+                <v-btn v-show="$vuetify.display.mdAndUp" color="error" size="small" class="ml-2"
+                  @click="deleteUser(item.id)">
                   Törlés
                 </v-btn>
-
-                <!-- Kis kijelzőn ikon -->
-                <v-btn
-                  v-show="$vuetify.display.smAndDown"
-                  icon
-                  color="warning"
-                  @click="editUser(item)"
-                >
+                <v-btn v-show="$vuetify.display.smAndDown" icon color="warning" @click="editUser(item)">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <v-btn
-                  v-show="$vuetify.display.smAndDown"
-                  icon
-                  color="error"
-                  class="ml-2"
-                  @click="deleteUser(item.id)"
-                >
+                <v-btn v-show="$vuetify.display.smAndDown" icon color="error" class="ml-2" @click="deleteUser(item.id)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </td>
@@ -62,59 +31,29 @@
           </template>
         </v-data-table>
       </div>
-
-      <!-- Versenyzők kezelése -->
       <div v-if="isAdminOrOrganizer" class="mt-4">
         <h2>Versenyzők kezelése</h2>
         <v-text-field v-model="searchCompetitors" label="Keresés..." class="mb-4" clearable></v-text-field>
-        <v-data-table
-          :headers="competitorHeaders"
-          :items="competitors"
-          :search="searchCompetitors"
-          items-per-page="5"
-          class="elevation-1"
-        >
+        <v-data-table :headers="competitorHeaders" :items="competitors" :search="searchCompetitors" items-per-page="5"
+          class="elevation-1">
           <template #item="{ item }">
             <tr>
               <td>{{ item.versenyzoId }}</td>
               <td>{{ item.nev }}</td>
               <td>{{ item.tajSzam }}</td>
               <td class="d-flex align-center">
-                <!-- Nagy kijelzőn szöveges -->
-                <v-btn
-                  v-show="$vuetify.display.mdAndUp"
-                  color="warning"
-                  size="small"
-                  @click="editCompetitor(item)"
-                >
+                <v-btn v-show="$vuetify.display.mdAndUp" color="warning" size="small" @click="editCompetitor(item)">
                   Módosítás
                 </v-btn>
-                <v-btn
-                  v-show="$vuetify.display.mdAndUp"
-                  color="error"
-                  size="small"
-                  class="ml-2"
-                  @click="deleteCompetitor(item.versenyzoId)"
-                >
+                <v-btn v-show="$vuetify.display.mdAndUp" color="error" size="small" class="ml-2"
+                  @click="deleteCompetitor(item.versenyzoId)">
                   Törlés
                 </v-btn>
-
-                <!-- Kis kijelzőn ikon -->
-                <v-btn
-                  v-show="$vuetify.display.smAndDown"
-                  icon
-                  color="warning"
-                  @click="editCompetitor(item)"
-                >
+                <v-btn v-show="$vuetify.display.smAndDown" icon color="warning" @click="editCompetitor(item)">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <v-btn
-                  v-show="$vuetify.display.smAndDown"
-                  icon
-                  color="error"
-                  class="ml-2"
-                  @click="deleteCompetitor(item.versenyzoId)"
-                >
+                <v-btn v-show="$vuetify.display.smAndDown" icon color="error" class="ml-2"
+                  @click="deleteCompetitor(item.versenyzoId)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </td>
@@ -123,7 +62,7 @@
         </v-data-table>
       </div>
     </div>
-    
+
     <div v-else class="text-center mt-5">
       <h1>Nincs jogosultságod az oldal megtekintéséhez!</h1>
     </div>
@@ -168,7 +107,8 @@
                 <v-text-field v-model="selectedCompetitor.nev" label="Név"></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="selectedCompetitor.szuletesiEv" label="Születési év" type="number"></v-text-field>
+                <v-text-field v-model="selectedCompetitor.szuletesiEv" label="Születési év"
+                  type="number"></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-select v-model="selectedCompetitor.neme" :items="genderOptions" label="Nem"></v-select>
@@ -207,7 +147,7 @@ export default {
     const showEditCompetitorDialog = ref(false);
     const selectedUser = ref({});
     const selectedCompetitor = ref({});
-    const userTypes = ["user","competitor","organizer","admin"];
+    const userTypes = ["user", "competitor", "organizer", "admin"];
     const genderOptions = ["Férfi", "Nő"];
 
     const userHeaders = [
@@ -225,18 +165,18 @@ export default {
     ];
 
     const loadUserData = () => {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            user.value = {
-                apiKey: parsedUser.apiKey,
-            };
-            userRole.value = parsedUser.tipus;
-            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
-        } else {
-            router.push("/login");
-        }
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        user.value = {
+          apiKey: parsedUser.apiKey,
+        };
+        userRole.value = parsedUser.tipus;
+        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+      } else {
+        router.push("/login");
+      }
     };
     const fetchUsers = async () => {
       try {
