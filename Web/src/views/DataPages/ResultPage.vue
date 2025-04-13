@@ -100,9 +100,7 @@
         </table>
       </div>
     </div>
-
     <br>
-
     <div class="chart-container" style="position: relative; height:20vh; width:80vw">
       <canvas id="myChart"></canvas>
     </div>

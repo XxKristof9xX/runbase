@@ -24,68 +24,72 @@
       <button class="btn btn-danger mt-3 ms-2" @click="logout">Kijelentkezés</button>
 
       <div
-  class="modal fade bd-example-modal-lg"
-  id="exampleModal6"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel6"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title text-danger" id="exampleModalLabel6">
-          Üdvözöljük, {{ competitorName || "Versenyző" }}!
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <h4 class="text-start">Versenyeken elért eredményeid:</h4>
-        <div class="table-wrapper-scroll-y my-custom-scrollbar">
-          <table class="table mt-3">
-            <tr>
-              <th>VersenyID</th>
-              <th>TávID</th>
-              <th>NévID</th>
-              <th>Indulási idő</th>
-              <th>Érkezési idő</th>
-              <th>Rajtszám</th>
-              <th>Statisztika</th>
-            </tr>
-            <tr v-for="r in competitionResults" :key="r.id">
-              <td>{{ r.versenyId }}</td>
-              <td>{{ r.tav }}</td>
-              <td>{{ r.versenyzoId }}</td>
-              <td>{{ r.indulas }}</td>
-              <td>{{ r.erkezes }}</td>
-              <td>{{ r.rajtszam }}</td>
-              <td>
-                <button
-                  class="btn btn-sm btn-info"
-                  @click="calculateStatistics(r.versenyId, r.tav)"
-                >
-                  Statisztika
-                </button>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div v-if="statistics" class="mt-4">
-          <h5>Statisztikai adatok</h5>
-          <p v-if="statistics.error" class="text-danger">
-            <strong>Hiba:</strong> {{ statistics.error }}
-          </p>
-          <p v-else>
-            <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}.
-          </p>
-          <p><strong>Adott versenykategóriában elindult versenyzők:</strong> {{ statistics.total }}</p>
-          <p><strong>Medián idő:</strong> {{ statistics.median }} perc</p>
-          <p><strong>Versenyző idő:</strong> {{ Math.round(statistics.competitorTime*100)/100 }} perc</p>
-          <p><strong>Versenyző tempója:</strong> {{ Math.round(statistics.competitorPace*100)/100 }} perc/km</p>
+        class="modal fade bd-example-modal-lg"
+        id="exampleModal6"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel6"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-danger" id="exampleModalLabel6">
+                Üdvözöljük, {{ competitorName || "Versenyző" }}!
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <h4 class="text-start">Versenyeken elért eredményeid:</h4>
+              <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table mt-3">
+                  <thead>
+                    <tr>
+                      <th>VersenyID</th>
+                      <th>TávID</th>
+                      <th>NévID</th>
+                      <th>Indulási idő</th>
+                      <th>Érkezési idő</th>
+                      <th>Rajtszám</th>
+                      <th>Statisztika</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="r in competitionResults" :key="r.id">
+                      <td>{{ r.versenyId }}</td>
+                      <td>{{ r.tav }}</td>
+                      <td>{{ r.versenyzoId }}</td>
+                      <td>{{ r.indulas }}</td>
+                      <td>{{ r.erkezes }}</td>
+                      <td>{{ r.rajtszam }}</td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-info"
+                          @click="calculateStatistics(r.versenyId, r.tav)"
+                        >
+                          Statisztika
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-if="statistics" class="mt-4">
+                <h5>Statisztikai adatok</h5>
+                <p v-if="statistics.error" class="text-danger">
+                  <strong>Hiba:</strong> {{ statistics.error }}
+                </p>
+                <p v-else>
+                  <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}.
+                </p>
+                <p><strong>Adott versenykategóriában elindult versenyzők:</strong> {{ statistics.total }}</p>
+                <p><strong>Medián idő:</strong> {{ statistics.median }} perc</p>
+                <p><strong>Versenyző idő:</strong> {{ Math.round(statistics.competitorTime * 100) / 100 }} perc</p>
+                <p><strong>Versenyző tempója:</strong> {{ Math.round(statistics.competitorPace * 100) / 100 }} perc/km</p>
               </div>
             </div>
           </div>
@@ -98,6 +102,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, onMounted } from "vue";
