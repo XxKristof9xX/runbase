@@ -4,7 +4,6 @@
   <v-container class="forum-container">
     <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
       <v-card class="forum-post">
-        <!-- A gomb áthelyezve ide, a v-card közvetlen gyermekeként -->
         <v-btn
           v-if="user && (user.type === 'admin' || user.type === 'organizer')"
           icon
@@ -127,7 +126,7 @@ export default {
   if (!confirm("Biztosan törlöd ezt a bejegyzést?")) return;
   try {
     await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/forum/${id}`);
-    fetchPosts(); // Frissítjük a listát
+    fetchPosts(); 
   } catch (error) {
     console.error("Hiba a törlés során:", error);
   }
