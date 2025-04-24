@@ -138,20 +138,28 @@ export default {
     
 const fetchCompetitorData = async () => {
   if (!user.value.competitorId) return;
-  try {
-    const [competitorResponse, resultsResponse] = await Promise.all([
-      axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`),
-      axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`),
-    ]);
 
+  try {
+    const competitorResponse = await axios.get(
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`
+    );
     competitorName.value = competitorResponse.data.nev;
+  } catch (error) {
+    console.error("Hiba a versenyző lekérésekor:", error);
+    competitorName.value = "Ismeretlen";
+  }
+
+  try {
+    const resultsResponse = await axios.get(
+      `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`
+    );
     competitionResults.value = resultsResponse.data;
   } catch (error) {
-    console.error("Hiba történt az adatok lekérésekor:", error);
-    competitorName.value = "Ismeretlen versenyző";
+    console.warn("Nincs versenyindulási adat:", error);
     competitionResults.value = [];
   }
 };
+
 
 const identifyCompetitor = async () => {
   if (!tajszam.value) {
