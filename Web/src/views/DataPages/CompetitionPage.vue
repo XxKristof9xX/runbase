@@ -28,6 +28,7 @@
                 name: 'CompetitionDetails',
                 params: { nev: c.nev },
                 query: {
+                  id: c.versenyId,
                   helyszin: c.helyszin,
                   datum: c.datum,
                   leiras: c.leiras,
