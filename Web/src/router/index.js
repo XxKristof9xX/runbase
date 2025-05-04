@@ -10,6 +10,7 @@ import Register from '../views/DataPages/RegisterPage.vue'
 import AdministrativPage from '@/views/DataPages/AdministrativPage.vue'
 import CompetitionModify from '@/views/DataPages/CompetitionModifyPage.vue'
 import Forum from '@/views/DataPages/ForumPage.vue'
+import CompetitionUpload from '@/views/DataPages/CompetitionUpload.vue'
 
 const routes = [
   {
@@ -73,6 +74,11 @@ const routes = [
     path: '/forum',
     name: 'forum',
     component: Forum
+  },
+  {
+    path: '/versenyfeltoltes',
+    name: 'versenyFeltoltes',
+    component: CompetitionUpload
   }
 ]
 

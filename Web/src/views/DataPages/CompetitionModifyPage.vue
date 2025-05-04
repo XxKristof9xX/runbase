@@ -104,18 +104,27 @@ export default {
     const router = useRouter();
     
     const loadUserData = () => {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            user.value = {
-                apiKey: parsedUser.apiKey,
-            };
-            isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
-        } else {
-            router.push("/login");
-        }
-    };
+  const storedUser = sessionStorage.getItem("user");
+  if (!storedUser) {
+    router.push("/login");
+    return;
+  }
+
+  const parsedUser = JSON.parse(storedUser);
+  user.value = {
+    apiKey: parsedUser.apiKey,
+    tipus: parsedUser.tipus,
+  };
+
+  if (!["admin", "organizer"].includes(parsedUser.tipus)) {
+    alert("Nincs jogosultságod az oldal megtekintéséhez.");
+    router.push("/");
+    return;
+  }
+
+  isAuthorized.value = true;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+};
 
     loadUserData();
     const loadCompetitions = async () => {
