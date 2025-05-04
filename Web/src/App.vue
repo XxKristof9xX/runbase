@@ -28,6 +28,7 @@
           <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
             <router-link to="/adminPage" class="nav-item nav-link" @click="closeMenu">Admin Panel</router-link>
             <router-link to="/competitionModify" class="nav-item nav-link" @click="closeMenu">Verseny Módosítás</router-link>
+            <router-link to="/versenyFeltoltes" class="nav-item nav-link" @click="closeMenu">Verseny Feltöltése</router-link>
           </div>
           <div class="navbar-nav ms-auto">
             <template v-if="isLoggedIn">

@@ -1,5 +1,5 @@
 <template>
-    <v-container class="d-flex justify-center">
+    <div class="container mt-4">
       <div v-if="isAuthorized">
         <v-card class="pa-4 custom-card">
           <h2 class="text-center">Új verseny létrehozása</h2>
@@ -32,8 +32,9 @@
           Nincs jogosultságod az oldal megtekintéséhez.
         </v-alert>
       </div>
-    </v-container>
+    </div>
   </template>
+  
   
   <script>
   import axios from "axios";
@@ -90,7 +91,7 @@
   
         const parsedUser = JSON.parse(storedUser);
         user.value = parsedUser;
-        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.szerep);
+        isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
         if (!isAuthorized.value) {
           alert("Nincs jogosultságod az oldal megtekintéséhez.");
           router.push("/");
@@ -114,7 +115,8 @@
   <style scoped>
   .custom-card {
     width: 100%;
-    max-width: 600px;
+    max-width: 900px;
+    margin: auto;
   }
   </style>
   
