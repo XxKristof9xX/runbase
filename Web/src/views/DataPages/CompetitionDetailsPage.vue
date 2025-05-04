@@ -27,10 +27,14 @@
       <button
         class="btn btn-primary mt-3"
         @click="jelentkezes"
-        :disabled="!selectedDistance"
+        :disabled="!selectedDistance || isPastEvent"
       >
         Jelentkezés
       </button>
+
+      <div class="mt-2 text-danger" v-if="isPastEvent">
+        Ez a verseny már lezajlott, nem lehet jelentkezni.
+      </div>
 
       <div class="mt-3" v-if="message">
         <p :class="{'text-success': success, 'text-danger': !success}">
@@ -80,6 +84,12 @@ export default {
       )
     );
 
+    const isPastEvent = computed(() => {
+      const today = new Date().toISOString().split("T")[0];
+      const versenyDatum = route.query.datum;
+      return versenyDatum < today;
+    });
+
     onMounted(() => {
       axios
         .get(
@@ -93,6 +103,12 @@ export default {
 
     const jelentkezes = () => {
       if (!selectedDistance.value || !user.value?.competitorId) return;
+
+      if (isPastEvent.value) {
+        message.value = "A verseny már lezajlott, nem lehet jelentkezni.";
+        success.value = false;
+        return;
+      }
 
       const payload = {
         versenyzoId: user.value.competitorId,
@@ -117,6 +133,12 @@ export default {
             error.response.data.includes("már jelentkezett")
           ) {
             message.value = "Már jelentkeztél erre a távra.";
+          } else if (
+            error.response &&
+            error.response.data &&
+            error.response.data.includes("már lezajlott")
+          ) {
+            message.value = "A verseny már lezajlott, nem lehet jelentkezni.";
           } else {
             message.value = "Hiba történt a jelentkezés során.";
           }
@@ -132,6 +154,7 @@ export default {
       jelentkezes,
       message,
       success,
+      isPastEvent,
     };
   },
 };
