@@ -5,12 +5,7 @@
       <div v-if="isAuthorized">
         <div class="row g-3">
           <div class="col-sm-12 col-md-6">
-            <select
-              id="postCompetitionId"
-              class="form-select"
-              @change="postFillUpCompetitionsDistances($event)"
-              required
-            >
+            <select id="postCompetitionId" class="form-select" @change="postFillUpCompetitionsDistances" required>
               <option value="" selected disabled hidden>Válasszon egy versenyt!</option>
               <option v-for="a in competitions" :key="a.versenyId" :value="a.versenyId">
                 {{ a.nev }}
@@ -61,14 +56,8 @@
 
       <v-row>
         <v-col cols="12">
-          <v-select
-            v-model="selectedRaceId"
-            :items="competitions"
-            item-title="nev"
-            item-value="versenyId"
-            label="Válassz versenyt"
-            @update:modelValue="loadRace"
-          ></v-select>
+          <v-select v-model="selectedRaceId" :items="competitions" item-title="nev" item-value="versenyId"
+            label="Válassz versenyt" @update:modelValue="loadRace"></v-select>
         </v-col>
       </v-row>
 
@@ -77,33 +66,67 @@
         <v-text-field v-model="selectedRace.helyszin" label="Helyszín" required></v-text-field>
         <v-text-field v-model="selectedRace.datum" label="Dátum" type="date" required></v-text-field>
         <v-textarea v-model="selectedRace.leiras" label="Leírás"></v-textarea>
-        <v-text-field v-model.number="selectedRace.maxLetszam" label="Max létszám" type="number" required></v-text-field>
-        
-        <v-file-input label="Kép feltöltése" @change="handleFileUpload"></v-file-input>
+        <v-text-field v-model.number="selectedRace.maxLetszam" label="Max létszám" type="number"
+          required></v-text-field>
+
+        <v-file-input label="Kép feltöltése" @change="uploadImage"></v-file-input>
 
         <div class="d-flex justify-center mt-3">
           <v-btn type="submit" color="primary">Mentés</v-btn>
           <v-btn color="error" @click="deleteRace" class="ml-2">Törlés</v-btn>
         </div>
+
+        <v-divider class="my-4"></v-divider>
+        <h3 class="text-center">Távok kezelése</h3>
+
+        <v-row>
+          <v-col cols="12" md="8">
+            <v-text-field v-model="newDistance" label="Új táv (pl. 10km)" required></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4" class="d-flex align-center">
+            <v-btn color="success" @click="addDistance">Hozzáadás</v-btn>
+          </v-col>
+        </v-row>
+
+        <v-table v-if="raceDistances.length" class="mt-3">
+          <thead>
+            <tr>
+              <th>Táv</th>
+              <th>Művelet</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(d, index) in raceDistances" :key="index">
+              <td>{{ d.tav }}</td>
+              <td>
+                <v-btn color="error" size="small" @click="deleteDistance(d.versenyId, d.tav)">Törlés</v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
       </v-form>
     </v-card>
   </v-container>
 </template>
 
-<script>
-import { ref, onMounted } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
-export default {
-  setup() {
-    const competitions = ref([]);
-    const postCompetitionDistances = ref([]);
-    const user = ref(null);
-    const isAuthorized = ref(false);
-    const router = useRouter();
-    
-    const loadUserData = () => {
+const competitions = ref([]);
+const postCompetitionDistances = ref([]);
+const competitionDistances = ref([]);
+const selectedRaceId = ref(null);
+const selectedRace = ref(null);
+const selectedFile = ref(null);
+const isAuthorized = ref(false);
+const newDistance = ref("");
+const raceDistances = ref([]);
+const apiUrl = "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net";
+const router = useRouter();
+
+const loadUserData = () => {
   const storedUser = sessionStorage.getItem("user");
   if (!storedUser) {
     router.push("/login");
@@ -111,10 +134,6 @@ export default {
   }
 
   const parsedUser = JSON.parse(storedUser);
-  user.value = {
-    apiKey: parsedUser.apiKey,
-    tipus: parsedUser.tipus,
-  };
 
   if (!["admin", "organizer"].includes(parsedUser.tipus)) {
     alert("Nincs jogosultságod az oldal megtekintéséhez.");
@@ -123,172 +142,110 @@ export default {
   }
 
   isAuthorized.value = true;
-  axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${parsedUser.apiKey}`;
 };
 
-    loadUserData();
-    const loadCompetitions = async () => {
-      try {
-        const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek");
-        competitions.value = response.data;
-        console.log("Versenyek betöltve:", competitions.value);
-      } catch (error) {
-        console.error("Hiba a versenyek betöltésekor:", error);
-      }
-    };
-
-    const handleCompetitionChange = async (event) => {
-      const selectedCompetitionId = event.target.value;
-      try {
-        const response = await axios.get(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/verseny/${selectedCompetitionId}/tavok`);
-        postCompetitionDistances.value = response.data;
-        console.log("Betöltött távok:", response.data);
-      } catch (error) {
-        console.error("Hiba a távok betöltésekor:", error);
-      }
-    };
-    
-
-    const post = async () => {
-      const competitionId = document.getElementById("postCompetitionId").value;
-      const distanceId = document.getElementById("postDistanceId").value;
-      const competitorId = document.getElementById("postCompetitorId").value;
-      const startTime = document.getElementById("postStart").value;
-      const finishTime = document.getElementById("postFinish").value;
-      const startNumber = document.getElementById("postStartNumber").value;
-
-      if (!competitionId || !distanceId || !competitorId || !startTime || !finishTime || !startNumber) {
-        alert("Nincs minden mező kitöltve!");
-        return;
-      }
-
-      const article = {
-        versenyzoId: competitorId,
-        versenyId: competitionId,
-        tav: distanceId,
-        indulas: startTime,
-        erkezes: finishTime,
-        rajtszam: startNumber,
-      };
-
-      try {
-        await axios.post("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas", article);
-        alert("Sikeres feltöltés!");
-      } catch (error) {
-        console.error("Hiba történt a feltöltés során:", error);
-        alert("Hiba történt a feltöltés során.");
-      }
-    };
-
-    onMounted(() => {
-      loadUserData();
-      loadCompetitions();
-    });
-
-    return {
-      competitions,
-      postCompetitionDistances,
-      handleCompetitionChange,
-      post,
-      isAuthorized,
-      competitionDistances: [],
-    };
-  },
-
-  data() {
-    return {
-      selectedRaceId: null,
-      selectedRace: null,
-    };
-  },
-  
-  created() {
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
-      .then((response) => {
-        console.log(response.data);
-        this.results = response.data;
-      })
-      .catch((error) => console.log(error));
-
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
-      .then((response) => {
-        console.log(this.competitions.data);
-        this.competitions = response.data;
-      })
-      .catch((error) => console.log(error));
-
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
-      .then((response) => {
-        console.log(this.competitionDistances.data);
-        this.competitionDistances = response.data;
-      })
-      .catch((error) => console.log(error));
-
-  },
-  methods: {
-    async saveRace() {
-      const formData = new FormData();
-      formData.append("nev", this.selectedRace.nev);
-      formData.append("helyszin", this.selectedRace.helyszin);
-      formData.append("datum", this.selectedRace.datum);
-      formData.append("leiras", this.selectedRace.leiras);
-      formData.append("maxLetszam", this.selectedRace.maxLetszam);
-      if (this.selectedFile) {
-        formData.append("kep", this.selectedFile);
-      }
-      
-      await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      alert("Verseny adatai frissítve.");
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file && file.size > 3 * 1024 * 1024) {
-        alert("A fájl mérete nem lehet nagyobb, mint 3MB!");
-        return;
-      }
-      this.selectedFile = file;
-    },
-  
-  postFillUpCompetitionsDistances(event) {
-      this.postCompetitionDistances = [];
-      this.competitionDistances.forEach((element) => {
-        if (element.versenyId == event.target.value) {
-          this.postCompetitionDistances.push(element.tav);
-        }
-      });
-    },
-
-    async loadRace() {
-      this.selectedRace = this.competitions.find(race => race.versenyId === this.selectedRaceId);
-    },
-    async deleteRace() {
-      if (confirm("Biztosan törölni szeretnéd ezt a versenyt?")) {
-        await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek/${this.selectedRace.versenyId}`);
-        this.selectedRace = null;
-        this.selectedRaceId = null;
-        alert("Verseny törölve.");
-      }
-    },
-    async uploadImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const formData = new FormData();
-      formData.append("file", file, `${this.selectedRace.versenyId}.jpg`);
-      await axios.post(`${this.apiUrl}/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      
-      alert("Kép feltöltve.");
-    }
-  },
-  
+const loadCompetitions = async () => {
+  const res = await axios.get(`${apiUrl}/api/versenyek`);
+  competitions.value = res.data;
 };
+
+const loadDistances = async () => {
+  const res = await axios.get(`${apiUrl}/api/versenytav`);
+  competitionDistances.value = res.data;
+};
+
+const postFillUpCompetitionsDistances = async (e) => {
+  const selectedId = parseInt(e.target.value);
+  const res = await axios.get(`${apiUrl}/api/versenytav?versenyId=${selectedId}`);
+  postCompetitionDistances.value = res.data.map(d => d.tav);
+};
+
+const post = async () => {
+  const payload = {
+    versenyzoId: document.getElementById("postCompetitorId").value,
+    versenyId: document.getElementById("postCompetitionId").value,
+    tav: document.getElementById("postDistanceId").value,
+    indulas: document.getElementById("postStart").value,
+    erkezes: document.getElementById("postFinish").value,
+    rajtszam: document.getElementById("postStartNumber").value,
+  };
+
+  if (Object.values(payload).some(v => !v)) {
+    alert("Nincs minden mező kitöltve!");
+    return;
+  }
+
+  await axios.post(`${apiUrl}/api/versenyindulas`, payload);
+  alert("Sikeres feltöltés!");
+};
+
+const loadRaceDistances = async () => {
+  if (!selectedRaceId.value) return;
+  const res = await axios.get(`${apiUrl}/api/versenytav/${selectedRaceId.value}`);
+  raceDistances.value = res.data;
+};
+
+const addDistance = async () => {
+  if (!newDistance.value || !selectedRaceId.value) {
+    alert("Kérlek, add meg a távot!");
+    return;
+  }
+  await axios.post(`${apiUrl}/api/versenytav`, { versenyId: selectedRaceId.value, tav: newDistance.value });
+  newDistance.value = "";
+  await loadRaceDistances();
+};
+
+const deleteDistance = async (versenyId, tav) => {
+  if (!confirm("Biztosan törlöd ezt a távot?")) return;
+  await axios.delete(`${apiUrl}/api/versenytav/${versenyId}/${tav}`);
+  await loadRaceDistances();
+};
+
+const loadRace = () => {
+  selectedRace.value = competitions.value.find(r => r.versenyId === selectedRaceId.value);
+  loadRaceDistances();
+};
+
+const saveRace = async () => {
+  const formData = new FormData();
+  formData.append("nev", selectedRace.value.nev);
+  formData.append("helyszin", selectedRace.value.helyszin);
+  formData.append("datum", selectedRace.value.datum);
+  formData.append("leiras", selectedRace.value.leiras);
+  formData.append("maxLetszam", selectedRace.value.maxLetszam);
+  if (selectedFile.value) {
+    formData.append("kep", selectedFile.value, `${selectedRace.value.versenyId}.jpg`);
+  }
+  await axios.put(`${apiUrl}/api/versenyek/${selectedRace.value.versenyId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  alert("Verseny adatai frissítve.");
+};
+
+const uploadImage = (event) => {
+  const file = event.target.files[0];
+  if (file && file.size > 3 * 1024 * 1024) {
+    alert("A fájl mérete nem lehet nagyobb, mint 3MB!");
+    return;
+  }
+  selectedFile.value = file;
+};
+
+const deleteRace = async () => {
+  if (!confirm("Biztosan törölni szeretnéd ezt a versenyt?")) return;
+  await axios.delete(`${apiUrl}/api/versenyek/${selectedRace.value.versenyId}`);
+  selectedRace.value = null;
+  selectedRaceId.value = null;
+  await loadCompetitions();
+  alert("Verseny törölve.");
+};
+
+onMounted(() => {
+  loadUserData();
+  loadCompetitions();
+  loadDistances();
+});
 </script>
 
 <style scoped>
