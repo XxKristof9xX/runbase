@@ -157,7 +157,7 @@ const loadDistances = async () => {
 
 const postFillUpCompetitionsDistances = async (e) => {
   const selectedId = parseInt(e.target.value);
-  const res = await axios.get(`${apiUrl}/api/versenytav?versenyId=${selectedId}`);
+  const res = await axios.get(`${apiUrl}/api/versenytav/${selectedId}`);
   postCompetitionDistances.value = res.data.map(d => d.tav);
 };
 
