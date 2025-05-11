@@ -3,27 +3,13 @@
   <div class="container">
     <div class="row">
       <div class="col-6">
-        <v-autocomplete
-          v-model="selectedCompetition"
-          :items="competitions.map(c => c.nev)"
-          label="Válasszon egy versenyt!"
-          outlined
-          dense
-          clearable
-          @update:modelValue="onCompetitionChange"
-        />
+        <v-autocomplete v-model="selectedCompetition" :items="competitions.map(c => c.nev)"
+          label="Válasszon egy versenyt!" outlined dense clearable @update:modelValue="onCompetitionChange" />
       </div>
 
       <div class="col-6">
-        <v-autocomplete
-          v-model="selectedDistance"
-          :items="selectedCompetitionDistances.map(d => `${d.tav} km`)"
-          label="Válasszon egy távot!"
-          outlined
-          dense
-          clearable
-          @update:modelValue="competitionResult"
-        />
+        <v-autocomplete v-model="selectedDistance" :items="selectedCompetitionDistances.map(d => `${d.tav} km`)"
+          label="Válasszon egy távot!" outlined dense clearable @update:modelValue="competitionResult" />
       </div>
 
       <div class="table-wrapper-scroll-y my-custom-scrollbar mt-2">
@@ -31,66 +17,25 @@
           <thead>
             <tr>
               <th>
-                <input
-                  type="button"
-                  @click="sortedByCompetitionId()"
-                  class="btn btn-light"
-                  value="Verseny Azonosító"
-                />
+                <input type="button" @click="sortedByDistanceId()" class="btn btn-light" value="Távok" />
               </th>
               <th>
-                <input
-                  type="button"
-                  @click="sortedByDistanceId()"
-                  class="btn btn-light"
-                  value="Távok"
-                />
+                <input type="button" class="btn btn-light" value="Indulási Idő" />
               </th>
               <th>
-                <input
-                  type="button"
-                  @click="sortedByNameId()"
-                  class="btn btn-light"
-                  value="Versenyző Azonosító"
-                />
+                <input type="button" class="btn btn-light" value="Érkezési Idő" />
               </th>
               <th>
-                <input
-                  type="button"
-                  class="btn btn-light"
-                  value="Indulási Idő"
-                />
+                <input type="button" @click="sortedByStartNumber()" class="btn btn-light" value="Rajtszám" />
               </th>
               <th>
-                <input
-                  type="button"
-                  class="btn btn-light"
-                  value="Érkezési Idő"
-                />
-              </th>
-              <th>
-                <input
-                  type="button"
-                  @click="sortedByStartNumber()"
-                  class="btn btn-light"
-                  value="Rajtszám"
-                />
-              </th>
-              <th>
-                <input
-                  type="button"
-                  @click="sortedByRunTime()"
-                  class="btn btn-light"
-                  value="Eltelt idő"
-                />
+                <input type="button" @click="sortedByRunTime()" class="btn btn-light" value="Eltelt idő" />
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="r in competitionResults" :key="r.Id">
-              <td>{{ r.versenyId }}</td>
               <td>{{ r.tav }} km</td>
-              <td>{{ r.versenyzoId }}</td>
               <td>{{ r.indulas }}</td>
               <td>{{ r.erkezes }}</td>
               <td>{{ r.rajtszam }}</td>
@@ -101,9 +46,12 @@
       </div>
     </div>
     <br>
-    <div class="chart-container" style="position: relative; height:20vh; width:80vw">
-      <canvas id="myChart"></canvas>
-    </div>
+    <div v-if="showChart" class="chart-container" style="position: relative; height:20vh; width:80vw">
+  <canvas id="myChart"></canvas>
+</div>
+<div v-else class="text-center mt-4 text-muted">
+  Nincs adat vagy nincs kiválasztva táv.
+</div>
   </div>
 </template>
 
@@ -113,6 +61,7 @@ import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { Chart, registerables } from 'chart.js';
+import { nextTick } from 'vue';
 Chart.register(...registerables);
 
 export default {
@@ -152,6 +101,7 @@ export default {
       competitionDistanceIds: [],
       selectedCompetitionDistances: [],
       postCompetitionDistances: [],
+      showChart: false,
       ascDesc: 0,
       myChart: null,
       selectedCompetition: null,
@@ -205,6 +155,7 @@ export default {
   methods: {
     onCompetitionChange() {
       this.selectedDistance = null;
+      this.showChart = false;
       const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
       if (!selectedComp) return;
 
@@ -213,22 +164,24 @@ export default {
     },
 
     competitionResult() {
-      this.competitionResults = [];
-      const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
-      if (!selectedComp) return;
+  this.competitionResults = [];
+  const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
+  if (!selectedComp || !this.selectedDistance) {
+    this.showChart = false;
+    return;
+  }
 
-      const selectedDistanceId = this.selectedDistance
-        ? parseInt(this.selectedDistance.split(" - ")[0])
-        : null;
+  const selectedDistanceValue = parseFloat(this.selectedDistance);
 
-      this.competitionResults = this.results.filter(result => {
-        const isSameCompetition = result.versenyId === selectedComp.versenyId;
-        const isSameDistance = selectedDistanceId ? result.tav === selectedDistanceId : true;
-        return isSameCompetition && isSameDistance;
-      });
+  this.competitionResults = this.results.filter(result => {
+    return result.versenyId === selectedComp.versenyId && result.tav === selectedDistanceValue;
+  });
 
-      this.renderChart();
-    },
+  this.showChart = true;
+  nextTick(() => {
+    this.renderChart();
+  });
+},
 
     sortedByCompetitionId() {
       if (this.ascDesc % 2 == 0) {
@@ -369,6 +322,7 @@ h1 {
   height: 400px;
   overflow: auto;
 }
+
 .table-wrapper-scroll-y {
   display: block;
 }
@@ -378,11 +332,15 @@ th {
   top: 0;
   background-color: white;
 }
+
 .post-select {
   height: 30px !important;
 }
+
 .chart-container {
   width: 100%;
+  max-width: 1000px;
   margin: auto;
+  height: 400px;
 }
 </style>
