@@ -1,52 +1,50 @@
 <template>
-  <div class="container">
-    <div class="col-12 pb-5">
-      <h1>{{ $route.params.nev }}</h1>
-    </div>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 font-weight-bold">{{ $route.params.nev }}</h1>
+      </v-col>
 
-    <div class="col-12">
-      <p>Helyszín: {{ $route.query.helyszin }}</p>
-      <p>Időpont: {{ $route.query.datum }}</p>
-      <p>Maximális létszám: {{ $route.query.max_letszam }} fő</p>
-      <p>{{ $route.query.leiras }}</p>
-    </div>
+      <v-col cols="12" class="mb-4">
+        <v-card class="pa-4">
+          <v-card-text>
+            <div><strong>Helyszín:</strong> {{ $route.query.helyszin }}</div>
+            <div><strong>Időpont:</strong> {{ $route.query.datum }}</div>
+            <div><strong>Maximális létszám:</strong> {{ $route.query.max_letszam }} fő</div>
+            <div class="mt-2">{{ $route.query.leiras }}</div>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-    <div class="col-12 my-4" v-if="user && user.type === 'competitor'">
-      <label for="tav">Válassz távot:</label>
-      <select v-model="selectedDistance" id="tav" class="form-select">
-        <option disabled value="">-- Válassz távot --</option>
-        <option
-          v-for="distance in filteredDistances"
-          :key="distance.versenyId"
-          :value="distance.tav"
-        >
-          {{ distance.tav }} km
-        </option>
-      </select>
+      <v-col cols="12" v-if="user && user.type === 'competitor'">
+        <v-select v-model="selectedDistance" :items="filteredDistances" item-title="tav" item-value="tav"
+          label="Válassz távot" return-object :menu-props="{ maxHeight: 300 }"
+          placeholder="-- Válassz távot --"></v-select>
 
-      <button
-        class="btn btn-primary mt-3"
-        @click="jelentkezes"
-        :disabled="!selectedDistance || isPastEvent"
-      >
-        Jelentkezés
-      </button>
+        <v-btn class="mt-4" color="primary" @click="jelentkezes" :disabled="!selectedDistance || isPastEvent">
+          Jelentkezés
+        </v-btn>
 
-      <div class="mt-2 text-danger" v-if="isPastEvent">
-        Ez a verseny már lezajlott, nem lehet jelentkezni.
-      </div>
+        <v-alert type="error" class="mt-3" v-if="isPastEvent">
+          Ez a verseny már lezajlott, nem lehet jelentkezni.
+        </v-alert>
 
-      <div class="mt-3" v-if="message">
-        <p :class="{'text-success': success, 'text-danger': !success}">
+        <v-alert v-if="message" :type="success ? 'success' : 'error'" class="mt-3">
           {{ message }}
-        </p>
-      </div>
-    </div>
+        </v-alert>
+      </v-col>
 
-    <div v-else class="mt-3">
-      <p><strong>Csak regisztrált versenyző jelentkezhet!</strong></p>
-    </div>
-  </div>
+      <v-col cols="12" v-else>
+        <v-alert type="warning" class="mb-4">
+          <strong>Csak regisztrált versenyző jelentkezhet!</strong><br />
+          Ha szeretne versenyzői adatokat megadni, látogasson el a profil oldalra.
+        </v-alert>
+        <v-btn color="secondary" @click="$router.push('/profil')">
+          Profil
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
