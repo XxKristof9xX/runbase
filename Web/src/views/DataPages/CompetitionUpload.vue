@@ -1,4 +1,5 @@
 <template>
+    <h1 class="my-3 text-center">Verseny feltöltés</h1>
     <div class="container mt-4">
         <div v-if="isAuthorized">
             <v-card class="pa-4 custom-card">

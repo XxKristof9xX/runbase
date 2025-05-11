@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div v-if="isAuthorized">
-      <h1>Admin Panel</h1>
+      <h1 class="my-3 text-center">Admin Panel</h1>
       <div v-if="isAdmin" class="mt-4">
         <h2>Felhasználók kezelése</h2>
         <v-text-field v-model="searchUsers" label="Keresés..." class="mb-4" clearable></v-text-field>

@@ -44,7 +44,7 @@
     </div>
 
     <div v-else class="mt-3">
-      <p><strong>Csak versenyző típusú felhasználók jelentkezhetnek.</strong></p>
+      <p><strong>Csak regisztrált versenyző jelentkezhet!</strong></p>
     </div>
   </div>
 </template>

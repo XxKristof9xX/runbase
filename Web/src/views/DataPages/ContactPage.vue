@@ -1,6 +1,6 @@
 <template>
   <v-container class="py-5">
-    <h1 class="text-h4 mb-6">Kapcsolat</h1>
+    <h1 class="my-3 text-center">Kapcsolat</h1>
 
     <v-row>
       <v-col cols="12" md="6">

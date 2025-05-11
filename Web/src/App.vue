@@ -176,6 +176,9 @@ nav a:hover {
   margin-left: 10px;
   color: white !important;
 }
+h1 {
+  margin-bottom: 50px !important;
+}
 
 @media (max-width: 991px) {
   .navbar-toggler {

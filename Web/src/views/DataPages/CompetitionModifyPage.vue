@@ -1,4 +1,5 @@
 <template>
+  <h1 class="my-3 text-center">Versenyek módosítása</h1>
   <div class="container mt-4">
     <v-card class="pa-4 mb-4 custom-card">
       <h2 class="mt-5 text-center">Verseny eredmény feltöltése</h2>
