@@ -52,7 +52,7 @@
               </td>
             </tr>
             <tr v-if="competitionResults.length === 0">
-              <td colspan="7">Nincs találat.</td>
+              <td colspan="7">Nincs találat vagy nincs kiválasztva táv.</td>
             </tr>
           </tbody>
         </table>
@@ -197,7 +197,6 @@ export default {
 
     generateQRCode(result) {
       const text = `${result.versenyId};${reslult.versenyzoId};${result.tav};${result.rajtszam}`;
-      
       QRCode.toDataURL(text)
         .then((url) => {
           const link = document.createElement("a");
