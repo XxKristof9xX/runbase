@@ -196,7 +196,8 @@ export default {
     },
 
     generateQRCode(result) {
-      const text = `versenyId:${result.versenyId};tav:${result.tav};rajtszam:${result.rajtszam}`;
+      const text = `${result.versenyId};${reslult.versenyzoId};${result.tav};${result.rajtszam}`;
+      
       QRCode.toDataURL(text)
         .then((url) => {
           const link = document.createElement("a");
