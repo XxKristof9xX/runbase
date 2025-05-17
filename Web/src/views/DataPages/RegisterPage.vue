@@ -144,7 +144,6 @@ export default {
     };
   },
   watch: {
-    // Ha kikapcsolod a versenyzői adatokat, ürítsd ki a mezőket és validáld újra a formot
     "form.includeAthleteData"(val) {
       if (!val) {
         this.form.athlete = {
@@ -163,8 +162,6 @@ export default {
     async register() {
       this.errorMessage = "";
       this.successMessage = "";
-
-      // Ellenőrizd a formot
       const isValid = await this.$refs.form.validate();
       if (!isValid) {
         this.errorMessage = "Kérlek, töltsd ki az összes kötelező mezőt helyesen!";
@@ -173,8 +170,6 @@ export default {
 
       this.loading = true;
       let versenyzoTajSzam = null;
-
-      // Versenyzői adatok mentése, ha szükséges
       if (this.form.includeAthleteData) {
         try {
           const versenyzoResponse = await axios.post(
