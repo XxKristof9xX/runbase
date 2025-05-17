@@ -31,8 +31,8 @@
 
 
 <script>
-import axios from "axios";
 import FutoVersenyLogo from "@/assets/Futoverseny_logo_pelda.jpg";
+import api from '@/services/api';
 
 export default {
   data() {
@@ -43,8 +43,8 @@ export default {
     };
   },
   created() {
-    axios
-      .get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+    api
+      .get("/versenyek")
       .then((response) => {
         this.competitions = response.data;
         this.loading = false;
