@@ -12,6 +12,7 @@ import CompetitionModify from '@/views/DataPages/CompetitionModifyPage.vue'
 import Forum from '@/views/DataPages/ForumPage.vue'
 import CompetitionUpload from '@/views/DataPages/CompetitionUpload.vue'
 import QrCodeGeneratePage from '@/views/DataPages/QrCodeGeneratePage.vue'
+import AdminPage from '@/views/DataPages/AdminPage.vue'
 
 const routes = [
   {
@@ -85,6 +86,11 @@ const routes = [
     path: '/qrgeneralas',
     name: 'qrgeneralas',
     component: QrCodeGeneratePage
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminPage
   }
 ]
 
