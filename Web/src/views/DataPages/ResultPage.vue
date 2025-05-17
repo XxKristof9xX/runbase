@@ -58,7 +58,7 @@
 
 <script>
 import { ref } from "vue";
-import axios from "axios";
+import api from '@/services/api';
 import { useRouter } from "vue-router";
 import { Chart, registerables } from 'chart.js';
 import { nextTick } from 'vue';
@@ -78,7 +78,7 @@ export default {
           apiKey: parsedUser.apiKey,
         };
         isAuthorized.value = ["admin", "organizer", "user", "competitor"].includes(parsedUser.tipus);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
       }
@@ -111,7 +111,7 @@ export default {
 
   created() {
     if (this.isAuthorized) {
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
+      api.get("/versenyindulas")
         .then((response) => {
           this.results = response.data;
           this.results.forEach(result => {
@@ -136,13 +136,13 @@ export default {
         })
         .catch((error) => console.log(error));
 
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+      api.get("/versenyek")
         .then((response) => {
           this.competitions = response.data;
         })
         .catch((error) => console.log(error));
 
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
+      api.get("/versenytav")
         .then((response) => {
           this.competitionDistances = response.data;
         })

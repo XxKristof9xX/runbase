@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from '@/services/api';
 
 export default {
   data() {
@@ -46,8 +46,8 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/login",
+        const response = await api.post(
+          "/felhasznalok/login",
           {
             Nev: this.form.username,
             Jelszo: this.form.password,

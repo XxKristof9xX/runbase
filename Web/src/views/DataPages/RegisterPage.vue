@@ -6,75 +6,27 @@
       </v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" @submit.prevent="register">
-          <v-text-field
-            v-model="form.username"
-            :rules="usernameRules"
-            label="Felhasználónév (min. 6 karakter)"
-            outlined
-            dense
-            class="mb-5"
-            required
-          ></v-text-field>
+          <v-text-field v-model="form.username" :rules="usernameRules" label="Felhasználónév (min. 6 karakter)" outlined
+            dense class="mb-5" required></v-text-field>
 
-          <v-text-field
-            v-model="form.password"
-            :rules="passwordRules"
-            label="Jelszó (min. 8 karakter)"
-            type="password"
-            outlined
-            dense
-            class="mb-5"
-            required
-          ></v-text-field>
+          <v-text-field v-model="form.password" :rules="passwordRules" label="Jelszó (min. 8 karakter)" type="password"
+            outlined dense class="mb-5" required></v-text-field>
 
-          <v-checkbox
-            v-model="form.includeAthleteData"
-            label="Saját versenyzői adatok megadása"
-            class="mb-5"
-          ></v-checkbox>
+          <v-checkbox v-model="form.includeAthleteData" label="Saját versenyzői adatok megadása"
+            class="mb-5"></v-checkbox>
 
           <div v-if="form.includeAthleteData">
-            <v-text-field
-              v-model="form.athlete.nev"
-              :rules="nameRules"
-              label="Név"
-              outlined
-              dense
-              class="mb-4"
-              required
-            ></v-text-field>
+            <v-text-field v-model="form.athlete.nev" :rules="nameRules" label="Név" outlined dense class="mb-4"
+              required></v-text-field>
 
-            <v-text-field
-              v-model="form.athlete.szuletesiEv"
-              :rules="birthYearRules"
-              label="Születési év"
-              type="number"
-              outlined
-              dense
-              class="mb-4"
-              required
-            ></v-text-field>
+            <v-text-field v-model="form.athlete.szuletesiEv" :rules="birthYearRules" label="Születési év" type="number"
+              outlined dense class="mb-4" required></v-text-field>
 
-            <v-select
-              v-model="form.athlete.neme"
-              :items="['Férfi', 'Nő']"
-              :rules="genderRules"
-              label="Neme"
-              outlined
-              dense
-              class="mb-4"
-              required
-            ></v-select>
+            <v-select v-model="form.athlete.neme" :items="['Férfi', 'Nő']" :rules="genderRules" label="Neme" outlined
+              dense class="mb-4" required></v-select>
 
-            <v-text-field
-              v-model="form.athlete.tajSzam"
-              :rules="tajRules"
-              label="TAJ szám"
-              outlined
-              dense
-              class="mb-4"
-              required
-            ></v-text-field>
+            <v-text-field v-model="form.athlete.tajSzam" :rules="tajRules" label="TAJ szám" outlined dense class="mb-4"
+              required></v-text-field>
           </div>
 
           <v-alert v-if="errorMessage" type="error" dense class="mb-5">
@@ -99,7 +51,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from '@/services/api';
 
 export default {
   data() {
@@ -172,8 +124,8 @@ export default {
       let versenyzoTajSzam = null;
       if (this.form.includeAthleteData) {
         try {
-          const versenyzoResponse = await axios.post(
-            "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/hozzaad",
+          const versenyzoResponse = await api.post(
+            "/versenyzo/hozzaad",
             {
               nev: this.form.athlete.nev,
               szuletesiEv: this.form.athlete.szuletesiEv,
@@ -196,8 +148,8 @@ export default {
 
       let felhasznaloId = null;
       try {
-        const response = await axios.post(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok",
+        const response = await api.post(
+          "/felhasznalok",
           {
             nev: this.form.username,
             jelszo: this.form.password,
@@ -213,8 +165,8 @@ export default {
 
         if (response.status === 200 || response.status === 201) {
           if (this.form.includeAthleteData && versenyzoTajSzam && felhasznaloId) {
-            await axios.put(
-              "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/addVersenyzo",
+            await api.put(
+              "/versenyzo/addVersenyzo",
               {
                 tajSzam: versenyzoTajSzam,
                 felhasznaloId: felhasznaloId,

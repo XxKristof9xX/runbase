@@ -38,7 +38,7 @@
 
 
 <script>
-import axios from "axios";
+import api from '@/services/api';
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -77,16 +77,15 @@ export default {
             }
 
             try {
-                const raceResponse = await axios.post(
-                    "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek",
+                const raceResponse = await api.post(
+                    "/versenyek",
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" } }
                 );
 
                 const newRaceId = raceResponse.data.id || raceResponse.data.versenyId;
                 for (const t of tavok.value) {
-                    await axios.post(
-                        "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/Versenytav",
+                    await api.post("/Versenytav",
                         {
                             versenyId: newRaceId,
                             tav: t.tav,
@@ -119,7 +118,7 @@ export default {
                 return;
             }
 
-            axios.defaults.headers.common["Authorization"] = `Bearer ${parsedUser.apiKey}`;
+            api.defaults.headers.common["Authorization"] = `Bearer ${parsedUser.apiKey}`;
         });
 
         return {

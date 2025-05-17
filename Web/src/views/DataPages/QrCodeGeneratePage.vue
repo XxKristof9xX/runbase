@@ -3,36 +3,24 @@
   <div class="container">
     <div class="row">
       <div class="col-6">
-        <v-autocomplete
-          v-model="selectedCompetition"
-          :items="competitions.map(c => c.nev)"
-          label="Válasszon egy versenyt!"
-          outlined
-          dense
-          clearable
-          @update:modelValue="onCompetitionChange"
-        />
+        <v-autocomplete v-model="selectedCompetition" :items="competitions.map(c => c.nev)"
+          label="Válasszon egy versenyt!" outlined dense clearable @update:modelValue="onCompetitionChange" />
       </div>
 
       <div class="col-6">
-        <v-autocomplete
-          v-model="selectedDistance"
-          :items="selectedCompetitionDistances.map(d => d.tav)"
-          label="Válasszon egy távot!"
-          outlined
-          dense
-          clearable
-          @update:modelValue="onDistanceChange"
-        />
+        <v-autocomplete v-model="selectedDistance" :items="selectedCompetitionDistances.map(d => d.tav)"
+          label="Válasszon egy távot!" outlined dense clearable @update:modelValue="onDistanceChange" />
       </div>
 
       <div class="table-wrapper-scroll-y my-custom-scrollbar mt-2">
         <table class="table mt-3">
           <thead>
             <tr>
-              <th><input type="button" @click="sortedByCompetitionId()" class="btn btn-light" value="Verseny Azonosító" /></th>
+              <th><input type="button" @click="sortedByCompetitionId()" class="btn btn-light"
+                  value="Verseny Azonosító" /></th>
               <th><input type="button" @click="sortedByDistanceId()" class="btn btn-light" value="Távok" /></th>
-              <th><input type="button" @click="sortedByNameId()" class="btn btn-light" value="Versenyző Azonosító" /></th>
+              <th><input type="button" @click="sortedByNameId()" class="btn btn-light" value="Versenyző Azonosító" />
+              </th>
               <th><input type="button" class="btn btn-light" value="Indulási Idő" /></th>
               <th><input type="button" class="btn btn-light" value="Érkezési Idő" /></th>
               <th><input type="button" @click="sortedByStartNumber()" class="btn btn-light" value="Rajtszám" /></th>
@@ -64,7 +52,7 @@
 
 <script>
 import { ref } from "vue";
-import axios from "axios";
+import api from '@/services/api';
 import { useRouter } from "vue-router";
 import { Chart, registerables } from 'chart.js';
 import QRCode from "qrcode";
@@ -84,7 +72,7 @@ export default {
           apiKey: parsedUser.apiKey,
         };
         isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
       }
@@ -112,7 +100,7 @@ export default {
 
   created() {
     if (this.isAuthorized) {
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas")
+      api.get("/versenyindulas")
         .then((response) => {
           this.results = response.data;
           this.results.forEach(result => {
@@ -132,13 +120,13 @@ export default {
         })
         .catch((error) => console.log(error));
 
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyek")
+      api.get("/versenyek")
         .then((response) => {
           this.competitions = response.data;
         })
         .catch((error) => console.log(error));
 
-      axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav")
+      api.get("/versenytav")
         .then((response) => {
           this.competitionDistances = response.data;
         })
@@ -164,7 +152,7 @@ export default {
       this.competitionResult();
     },
 
-    
+
     competitionResult() {
       this.competitionResults = [];
       const selectedComp = this.competitions.find(c => c.nev === this.selectedCompetition);
@@ -224,6 +212,7 @@ h1 {
   height: 400px;
   overflow: auto;
 }
+
 .table-wrapper-scroll-y {
   display: block;
 }
@@ -233,9 +222,11 @@ th {
   top: 0;
   background-color: white;
 }
+
 .post-select {
   height: 30px !important;
 }
+
 .chart-container {
   width: 100%;
   margin: auto;

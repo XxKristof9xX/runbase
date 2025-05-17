@@ -49,7 +49,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import api from '@/services/api';
 
 export default {
   setup() {
@@ -67,12 +67,12 @@ export default {
         competitorId: parsedUser.versenyzoId,
         apiKey: parsedUser.apiKey,
       };
-      axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
     }
 
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/forum");
+        const response = await api.get("/forum");
         posts.value = response.data;
       } catch (error) {
         console.error("Hiba a bejegyzések lekérésekor:", error);
@@ -101,7 +101,7 @@ export default {
       }
 
       try {
-        await axios.post("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/forum", formData, {
+        await api.post("/forum", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         newPost.value = { tartalom: "", kep: null };
@@ -125,7 +125,7 @@ export default {
     const deletePost = async (id) => {
   if (!confirm("Biztosan törlöd ezt a bejegyzést?")) return;
   try {
-    await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/forum/${id}`);
+    await api.delete(`/forum/${id}`);
     fetchPosts(); 
   } catch (error) {
     console.error("Hiba a törlés során:", error);

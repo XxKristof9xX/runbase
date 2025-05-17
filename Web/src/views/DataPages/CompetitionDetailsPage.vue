@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from '@/services/api';
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 
@@ -72,7 +72,7 @@ export default {
         competitorId: parsedUser.versenyzoId,
         apiKey: parsedUser.apiKey,
       };
-      axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
     }
 
     const versenyId = route.query.id;
@@ -90,9 +90,9 @@ export default {
     });
 
     onMounted(() => {
-      axios
+      api
         .get(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenytav"
+          "versenytav"
         )
         .then((response) => {
           competitionDistances.value = response.data;
@@ -115,9 +115,9 @@ export default {
         tav: parseFloat(selectedDistance.value.tav),
       };
 
-      axios
+      api
         .post(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/jelentkezes",
+          "versenyindulas/jelentkezes",
           payload
         )
         .then(() => {

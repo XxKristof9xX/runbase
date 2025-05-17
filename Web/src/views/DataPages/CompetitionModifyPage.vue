@@ -112,7 +112,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '@/services/api';
 import { useRouter } from 'vue-router';
 
 const competitions = ref([]);
@@ -124,7 +124,6 @@ const selectedFile = ref(null);
 const isAuthorized = ref(false);
 const newDistance = ref("");
 const raceDistances = ref([]);
-const apiUrl = "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net";
 const router = useRouter();
 
 const loadUserData = () => {
@@ -143,22 +142,22 @@ const loadUserData = () => {
   }
 
   isAuthorized.value = true;
-  axios.defaults.headers.common["Authorization"] = `Bearer ${parsedUser.apiKey}`;
+  api.defaults.headers.common["Authorization"] = `Bearer ${parsedUser.apiKey}`;
 };
 
 const loadCompetitions = async () => {
-  const res = await axios.get(`${apiUrl}/api/versenyek`);
+  const res = await api.get(`/versenyek`);
   competitions.value = res.data;
 };
 
 const loadDistances = async () => {
-  const res = await axios.get(`${apiUrl}/api/versenytav`);
+  const res = await api.get(`/versenytav`);
   competitionDistances.value = res.data;
 };
 
 const postFillUpCompetitionsDistances = async (e) => {
   const selectedId = parseInt(e.target.value);
-  const res = await axios.get(`${apiUrl}/api/versenytav/${selectedId}`);
+  const res = await api.get(`/versenytav/${selectedId}`);
   postCompetitionDistances.value = res.data.map(d => d.tav);
 };
 
@@ -177,13 +176,13 @@ const post = async () => {
     return;
   }
 
-  await axios.post(`${apiUrl}/api/versenyindulas`, payload);
+  await api.post(`/versenyindulas`, payload);
   alert("Sikeres feltöltés!");
 };
 
 const loadRaceDistances = async () => {
   if (!selectedRaceId.value) return;
-  const res = await axios.get(`${apiUrl}/api/versenytav/${selectedRaceId.value}`);
+  const res = await api.get(`/versenytav/${selectedRaceId.value}`);
   raceDistances.value = res.data;
 };
 
@@ -192,14 +191,14 @@ const addDistance = async () => {
     alert("Kérlek, add meg a távot!");
     return;
   }
-  await axios.post(`${apiUrl}/api/versenytav`, { versenyId: selectedRaceId.value, tav: newDistance.value });
+  await api.post(`/versenytav`, { versenyId: selectedRaceId.value, tav: newDistance.value });
   newDistance.value = "";
   await loadRaceDistances();
 };
 
 const deleteDistance = async (versenyId, tav) => {
   if (!confirm("Biztosan törlöd ezt a távot?")) return;
-  await axios.delete(`${apiUrl}/api/versenytav/${versenyId}/${tav}`);
+  await api.delete(`/versenytav/${versenyId}/${tav}`);
   await loadRaceDistances();
 };
 
@@ -218,7 +217,7 @@ const saveRace = async () => {
   if (selectedFile.value) {
     formData.append("kep", selectedFile.value, `${selectedRace.value.versenyId}.jpg`);
   }
-  await axios.put(`${apiUrl}/api/versenyek/${selectedRace.value.versenyId}`, formData, {
+  await api.put(`/versenyek/${selectedRace.value.versenyId}`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
   alert("Verseny adatai frissítve.");
@@ -235,7 +234,7 @@ const uploadImage = (event) => {
 
 const deleteRace = async () => {
   if (!confirm("Biztosan törölni szeretnéd ezt a versenyt?")) return;
-  await axios.delete(`${apiUrl}/api/versenyek/${selectedRace.value.versenyId}`);
+  await api.delete(`/versenyek/${selectedRace.value.versenyId}`);
   selectedRace.value = null;
   selectedRaceId.value = null;
   await loadCompetitions();

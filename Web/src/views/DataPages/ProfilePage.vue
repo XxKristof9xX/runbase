@@ -121,7 +121,7 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from '@/services/api';
 
 export default {
   setup() {
@@ -151,7 +151,7 @@ export default {
           competitorId: parsedUser.versenyzoId,
           apiKey: parsedUser.apiKey,
         };
-        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
       }
@@ -161,8 +161,8 @@ export default {
       if (!user.value.competitorId) return;
 
       try {
-        const competitorResponse = await axios.get(
-          `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${user.value.competitorId}`
+        const competitorResponse = await api.get(
+          `/versenyzo/${user.value.competitorId}`
         );
         competitorName.value = competitorResponse.data.nev;
       } catch (error) {
@@ -171,8 +171,8 @@ export default {
       }
 
       try {
-        const resultsResponse = await axios.get(
-          `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas/${user.value.competitorId}`
+        const resultsResponse = await api.get(
+          `/versenyindulas/${user.value.competitorId}`
         );
         competitionResults.value = resultsResponse.data;
       } catch (error) {
@@ -190,8 +190,8 @@ export default {
       }
 
       try {
-        const response = await axios.put(
-          `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/addVersenyzo`,
+        const response = await api.put(
+          `/versenyzo/addVersenyzo`,
           {
             tajSzam: tajszam.value,
             felhasznaloId: user.value.id,
@@ -227,8 +227,8 @@ export default {
 
     const calculateStatistics = async (raceId, distanceId) => {
       try {
-        const response = await axios.get(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyindulas");
+        const response = await api.get(
+          "/versenyindulas");
         const allResults = response.data;
 
         const allResultsInCategory = [];
@@ -304,8 +304,8 @@ export default {
       }
 
       try {
-        const createResponse = await axios.post(
-          "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/hozzaad",
+        const createResponse = await api.post(
+          "/versenyzo/hozzaad",
           {
             nev: adat.nev,
             szuletesiEv: adat.szuletesiEv,
@@ -314,12 +314,12 @@ export default {
           }
         );
         if (createResponse.status === 200) {
-          const getIdResponse = await axios.get(
-            `https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/getByTaj/${adat.tajSzam}`
+          const getIdResponse = await api.get(
+            `/versenyzo/getByTaj/${adat.tajSzam}`
           );
           const versenyzoId = getIdResponse.data.versenyzoId;
-          const assignResponse = await axios.put(
-            "https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/addVersenyzo",
+          const assignResponse = await api.put(
+            "/versenyzo/addVersenyzo",
             {
               tajSzam: adat.tajSzam,
               felhasznaloId: user.value.id,

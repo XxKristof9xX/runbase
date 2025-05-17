@@ -131,7 +131,7 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
+import api from '@/services/api';
 import { useRouter } from "vue-router";
 
 export default {
@@ -173,14 +173,14 @@ export default {
         };
         userRole.value = parsedUser.tipus;
         isAuthorized.value = ["admin", "organizer"].includes(parsedUser.tipus);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${user.value.apiKey}`;
       } else {
         router.push("/login");
       }
     };
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/");
+        const response = await api.get("felhasznalok/");
         users.value = response.data;
       } catch (error) {
 
@@ -190,7 +190,7 @@ export default {
 
     const fetchCompetitors = async () => {
       try {
-        const response = await axios.get("https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/");
+        const response = await api.get("versenyzo/");
         competitors.value = response.data;
       } catch (error) {
         console.error("Hiba a versenyzők betöltésekor:", error);
@@ -204,7 +204,7 @@ export default {
 
     const saveUser = async () => {
       try {
-        await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${selectedUser.value.id}`, selectedUser.value);
+        await api.put(`felhasznalok/${selectedUser.value.id}`, selectedUser.value);
         fetchUsers();
         closeEditUserDialog();
       } catch (error) {
@@ -224,7 +224,7 @@ export default {
 
     const saveCompetitor = async () => {
       try {
-        await axios.put(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${selectedCompetitor.value.versenyzoId}`, selectedCompetitor.value);
+        await api.put(`versenyzo/${selectedCompetitor.value.versenyzoId}`, selectedCompetitor.value);
         fetchCompetitors();
         closeEditCompetitorDialog();
       } catch (error) {
@@ -239,7 +239,7 @@ export default {
     const deleteUser = async (id) => {
       if (confirm("Biztosan törölni szeretnéd ezt a felhasználót?")) {
         try {
-          await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/felhasznalok/${id}`);
+          await api.delete(`felhasznalok/${id}`);
           users.value = users.value.filter(user => user.id !== id);
         } catch (error) {
           console.error("Hiba a törléskor:", error);
@@ -250,7 +250,7 @@ export default {
     const deleteCompetitor = async (versenyzoId) => {
       if (confirm("Biztosan törölni szeretnéd ezt a versenyzőt?")) {
         try {
-          await axios.delete(`https://runbaseapi-e7avcnaqbmhuh6bp.northeurope-01.azurewebsites.net/api/versenyzo/${versenyzoId}`);
+          await api.delete(`versenyzo/${versenyzoId}`);
           competitors.value = competitors.value.filter(competitor => competitor.versenyzoId !== versenyzoId);
         } catch (error) {
           console.error("Hiba a törléskor:", error);
