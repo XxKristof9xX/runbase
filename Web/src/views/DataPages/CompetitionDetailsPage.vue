@@ -5,21 +5,22 @@
         <h1 class="text-h4 font-weight-bold">{{ $route.params.nev }}</h1>
       </v-col>
 
-      <v-col cols="12" class="mb-4">
+      <v-col cols="12" md="6" class="mx-auto mb-4">
         <v-card class="pa-4">
           <v-card-text>
             <div><strong>Helyszín:</strong> {{ $route.query.helyszin }}</div>
             <div><strong>Időpont:</strong> {{ $route.query.datum }}</div>
             <div><strong>Maximális létszám:</strong> {{ $route.query.max_letszam }} fő</div>
-            <div class="mt-2">{{ $route.query.leiras }}</div>
+            <div class="mt-2 text-left">{{ $route.query.leiras }}</div>
           </v-card-text>
         </v-card>
       </v-col>
 
-      <v-col cols="12" v-if="user && user.type === 'competitor'">
-        <v-select v-model="selectedDistance" :items="filteredDistances" item-title="tav" item-value="tav"
-          label="Válassz távot" return-object :menu-props="{ maxHeight: 300 }"
-          placeholder="-- Válassz távot --"></v-select>
+      <v-col cols="12" sm="6" md="4" v-if="user && user.type === 'competitor'">
+        <v-select v-model="selectedDistance" :items="filteredDistances"
+          :item-title="item => item && item.tav ? item.tav + ' km' : ''" item-value="tav" label="Válassz távot"
+          return-object :menu-props="{ maxHeight: 300 }" placeholder="-- Válassz távot --"></v-select>
+
 
         <v-btn class="mt-4" color="primary" @click="jelentkezes" :disabled="!selectedDistance || isPastEvent">
           Jelentkezés
@@ -111,7 +112,7 @@ export default {
       const payload = {
         versenyzoId: user.value.competitorId,
         versenyId: parseInt(versenyId),
-        tav: parseFloat(selectedDistance.value),
+        tav: parseFloat(selectedDistance.value.tav),
       };
 
       axios
