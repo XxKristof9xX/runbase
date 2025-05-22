@@ -1,49 +1,67 @@
 <template>
-  <div id="app">
-    <nav class="navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <router-link to="/" class="navbar-brand">
-          <img src="../Images/RunBase_full_logo.png" alt="RunBase Logo" />
-        </router-link>
-        <button
-          type="button"
-          class="navbar-toggler"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarCollapse"
-          aria-controls="navbarCollapse"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-          @click="toggleMenu"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse" ref="navbarCollapse">
-          <div class="navbar-nav">
-            <router-link to="/" class="nav-item nav-link" @click="closeMenu">Főoldal</router-link>
-            <router-link to="/versenyek" class="nav-item nav-link" @click="closeMenu">Versenyek</router-link>
-            <router-link to="/eredmenyek" class="nav-item nav-link" @click="closeMenu">Eredmények</router-link>
-            <router-link to="/forum" class="nav-item nav-link" @click="closeMenu">Fórum</router-link>
-            <router-link to="/kapcsolat" class="nav-item nav-link" @click="closeMenu">Kapcsolat</router-link>
-          </div>
-          <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
-            <router-link to="/adminPage" class="nav-item nav-link" @click="closeMenu">Admin Panel</router-link>
-            <router-link to="/competitionModify" class="nav-item nav-link" @click="closeMenu">Verseny Módosítás</router-link>
-            <router-link to="/versenyFeltoltes" class="nav-item nav-link" @click="closeMenu">Verseny Feltöltése</router-link>
-            <router-link to="/qrgeneralas" class="nav-item nav-link" @click="closeMenu">QR Generálás</router-link>
-          </div>
-          <div class="navbar-nav ms-auto">
-            <template v-if="isLoggedIn">
-              <router-link to="/profil" class="nav-item nav-link" @click="closeMenu">Profil</router-link>
-              <button class="btn btn-danger nav-item nav-link" @click="logout">Kijelentkezés</button>
-            </template>
-            <router-link v-else to="/login" class="nav-item nav-link" @click="closeMenu">Bejelentkezés</router-link>
+  <v-app>
+    <div id="app">
+      <nav class="navbar navbar-expand-xl">
+        <div class="container-fluid">
+          <router-link to="/" class="navbar-brand">
+            <img src="../Images/RunBase_full_logo.png" alt="RunBase Logo" />
+          </router-link>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" @click="toggleMenu">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarCollapse" ref="navbarCollapse">
+            <div class="navbar-nav">
+              <v-btn text class="mx-1" @click="navigateTo('/')">Főoldal</v-btn>
+              <v-btn text class="mx-1" @click="navigateTo('/versenyek')">Versenyek</v-btn>
+              <v-btn text class="mx-1" @click="navigateTo('/eredmenyek')">Eredmények</v-btn>
+              <v-btn text class="mx-1" @click="navigateTo('/forum')">Fórum</v-btn>
+              <v-btn text class="mx-1" @click="navigateTo('/kapcsolat')">Kapcsolat</v-btn>
+            </div>
+
+            <div class="navbar-nav ms-auto" v-if="isAdminOrOrganizer">
+              <v-menu offset-y>
+                <template #activator="{ props }">
+                  <v-btn color="primary" v-bind="props" class="mx-2" dark>
+                    Admin menü
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item @click="navigateTo('/adminPage')">
+                    <v-list-item-title>Admin Panel</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="navigateTo('/competitionModify')">
+                    <v-list-item-title>Verseny Módosítás</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="navigateTo('/versenyFeltoltes')">
+                    <v-list-item-title>Verseny Feltöltése</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="navigateTo('/qrgeneralas')">
+                    <v-list-item-title>QR Generálás</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+
+            <div class="navbar-nav ms-auto">
+              <template v-if="isLoggedIn">
+                <v-btn text class="mx-1" @click="navigateTo('/profil')">Profil</v-btn>
+                <v-btn color="error" class="mx-1 logout-btn" @click="logout">Kijelentkezés</v-btn>
+              </template>
+              <template v-else>
+                <v-btn text class="mx-1" @click="navigateTo('/login')">Bejelentkezés</v-btn>
+              </template>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
-    <router-view />
-  </div>
+      </nav>
+
+      <router-view />
+    </div>
+  </v-app>
 </template>
+
 
 <script>
 import { useRouter } from "vue-router";
@@ -113,12 +131,18 @@ export default {
       return userRole.value === "admin" || userRole.value === "organizer";
     });
 
+    const navigateTo = (path) => {
+      router.push(path);
+      closeMenu();
+    };
+
     return {
       isLoggedIn,
       isAdminOrOrganizer,
       logout,
       closeMenu,
       toggleMenu,
+      navigateTo
     };
   },
 };
@@ -140,6 +164,21 @@ body {
 .navbar {
   background-color: #20283F;
   padding: 10px 0;
+}
+
+.navbar-nav .v-btn {
+  background-color: #20283F !important;
+  color: white !important;
+  border: 2px solid white;
+  border-radius: 10px;
+}
+
+
+.navbar-nav .logout-btn {
+  background-color: #d32f2f !important;
+  color: white !important;
+  border: 2px solid white;
+  border-radius: 10px;
 }
 
 .navbar-nav {
@@ -176,11 +215,12 @@ nav a:hover {
   margin-left: 10px;
   color: white !important;
 }
+
 h1 {
   margin-bottom: 50px !important;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1200px) {
   .navbar-toggler {
     border: none !important;
   }
@@ -192,10 +232,14 @@ h1 {
   .navbar-nav {
     width: 100%;
     text-align: center;
+    flex-direction: column;
   }
-  
-  .nav-item {
-    margin-bottom: 10px;
+
+  .navbar-nav .v-btn {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    justify-content: center;
   }
 }
 </style>

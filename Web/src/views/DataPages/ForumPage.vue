@@ -1,16 +1,11 @@
 <template>
-<h1 class="my-3">Fórum</h1>
+  <h1 class="my-3">Fórum</h1>
 
   <v-container class="forum-container">
     <v-list-item v-for="post in posts" :key="post.id" class="mb-4">
       <v-card class="forum-post">
-        <v-btn
-          v-if="user && (user.type === 'admin' || user.type === 'organizer')"
-          icon
-          color="red"
-          class="delete-button"
-          @click="deletePost(post.id)"
-        >
+        <v-btn v-if="user && (user.type === 'admin' || user.type === 'organizer')" icon color="red"
+          class="delete-button" @click="deletePost(post.id)">
           <v-icon size="20">mdi-close</v-icon>
         </v-btn>
 
@@ -19,13 +14,7 @@
         </div>
         <div class="post-content">
           <div class="post-image-wrapper" v-if="post.kep">
-            <v-img
-              :src="getImage(post.kep)"
-              height="300"
-              width="auto"
-              class="post-image"
-              contain
-            ></v-img>
+            <v-img :src="getImage(post.kep)" height="300" width="auto" class="post-image" contain></v-img>
           </div>
           <div class="post-text">
             <div class="post-body">{{ post.tartalom }}</div>
@@ -123,26 +112,27 @@ export default {
     };
 
     const deletePost = async (id) => {
-  if (!confirm("Biztosan törlöd ezt a bejegyzést?")) return;
-  try {
-    await api.delete(`/forum/${id}`);
-    fetchPosts(); 
-  } catch (error) {
-    console.error("Hiba a törlés során:", error);
-  }
-};
+      if (!confirm("Biztosan törlöd ezt a bejegyzést?")) return;
+      try {
+        await api.delete(`/forum/${id}`);
+        fetchPosts();
+      } catch (error) {
+        console.error("Hiba a törlés során:", error);
+      }
+    };
 
 
     onMounted(fetchPosts);
 
-    return { 
-      posts, 
-      newPost, 
-      handleFileUpload, 
-      submitPost, 
-      formatDate, 
+    return {
+      posts,
+      newPost,
+      handleFileUpload,
+      submitPost,
+      formatDate,
       user,
-      deletePost};
+      deletePost
+    };
   },
   methods: {
     getImage(base64Data) {
@@ -154,20 +144,21 @@ export default {
 
 <style scoped>
 .forum-container {
-  border: 1px solid #000;
+  border: 5px solid #000;
   padding: 16px;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #e6e6e6;
 }
 
 .forum-post {
   background-color: #ffffff;
   border-left: 4px solid #1976d2;
   padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   text-align: left;
   position: relative;
 }
+
 
 .post-header {
   font-weight: bold;
@@ -224,5 +215,9 @@ export default {
   text-align: right;
   margin-top: auto;
   align-self: flex-end;
+}
+
+.v-container {
+  margin-bottom: 100px;
 }
 </style>
