@@ -64,7 +64,6 @@
                     <tr>
                       <th>VersenyID</th>
                       <th>TávID</th>
-                      <th>NévID</th>
                       <th>Indulási idő</th>
                       <th>Érkezési idő</th>
                       <th>Rajtszám</th>
@@ -75,7 +74,6 @@
                     <tr v-for="r in competitionResults" :key="r.id">
                       <td>{{ r.versenyId }}</td>
                       <td>{{ r.tav }}</td>
-                      <td>{{ r.versenyzoId }}</td>
                       <td>{{ r.indulas }}</td>
                       <td>{{ r.erkezes }}</td>
                       <td>{{ r.rajtszam }}</td>
@@ -89,18 +87,27 @@
                 </table>
               </div>
               <div v-if="statistics" class="mt-4">
-                <h5>Statisztikai adatok</h5>
-                <p v-if="statistics.error" class="text-danger">
-                  <strong>Hiba:</strong> {{ statistics.error }}
-                </p>
-                <p v-else>
-                  <strong>Helyezés a kategóriában: </strong> {{ statistics.rank }}.
-                </p>
-                <p><strong>Adott versenykategóriában elindult versenyzők:</strong> {{ statistics.total }}</p>
-                <p><strong>Medián idő:</strong> {{ statistics.median }} perc</p>
-                <p><strong>Versenyző idő:</strong> {{ Math.round(statistics.competitorTime * 100) / 100 }} perc</p>
-                <p><strong>Versenyző tempója:</strong> {{ Math.round(statistics.competitorPace * 100) / 100 }} perc/km
-                </p>
+                <v-card class="pa-4 elevation-2">
+                  <v-card-title class="text-h6 font-weight-bold">Statisztikai adatok</v-card-title>
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="4">
+                        <strong>Helyezés: </strong> {{ statistics.rank }} / {{ statistics.total }}
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <strong>Medián idő: </strong>
+                        <span v-if="statistics.median !== null"> {{ statistics.median.toFixed(2) }} perc</span>
+                        <span v-else>N/A</span>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <strong>Saját idő: </strong> {{ statistics.competitorTime.toFixed(2) }} perc
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <strong>Tempó: </strong> {{ statistics.competitorPace.toFixed(2) }} perc/km
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
               </div>
             </div>
           </div>
@@ -250,18 +257,20 @@ export default {
 
         const rank = allResultsInCategory.findIndex(result => result.id === user.value.competitorId) + 1;
 
-        let median;
-        if (allResultsInCategory.length % 2 === 0) {
-          const mid1 = allResultsInCategory[allResultsInCategory.length / 2 - 1];
-          const mid2 = allResultsInCategory[allResultsInCategory.length / 2];
-          median = (mid1 + mid2) / 2;
+        let median = 0;
+        const n = allResultsInCategory.length;
+        if (n > 0) {
+          if (n % 2 === 0) {
+            median = (allResultsInCategory[n / 2 - 1].result + allResultsInCategory[n / 2].result) / 2;
+          } else {
+            median = allResultsInCategory[Math.floor(n / 2)].result;
+          }
         } else {
-          median = allResultsInCategory[Math.floor(allResultsInCategory.length + 1 / 2)];
+          median = null;
         }
         const filteredResults = allResults.filter(
           (r) => r.versenyId === raceId && r.tav === distanceId
         );
-        console.log(median);
 
         if (!filteredResults.length) {
           statistics.value = null;
