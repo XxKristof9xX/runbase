@@ -21,7 +21,6 @@
           </div>
         </div>
 
-
         <div v-if="ujVersenyzo">
           <input v-model="newCompetitor.nev" type="text" class="form-control mt-3" placeholder="Név" />
           <input v-model="newCompetitor.szuletesiEv" type="number" class="form-control mt-2"
@@ -63,7 +62,7 @@
                   <thead>
                     <tr>
                       <th>VersenyID</th>
-                      <th>TávID</th>
+                      <th>Táv</th>
                       <th>Indulási idő</th>
                       <th>Érkezési idő</th>
                       <th>Rajtszám</th>
@@ -71,7 +70,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="r in competitionResults" :key="r.id">
+                    <tr v-for="r in completedResults" :key="r.id">
                       <td>{{ r.versenyId }}</td>
                       <td>{{ r.tav }}</td>
                       <td>{{ r.indulas }}</td>
@@ -86,6 +85,27 @@
                   </tbody>
                 </table>
               </div>
+
+              <h4 class="text-start mt-4">Jelentkezések:</h4>
+              <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table mt-3">
+                  <thead>
+                    <tr>
+                      <th>VersenyID</th>
+                      <th>Táv</th>
+                      <th>Rajtszám</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="r in applications" :key="r.id">
+                      <td>{{ r.versenyId }}</td>
+                      <td>{{ r.tav }}</td>
+                      <td>{{ r.rajtszam }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
               <div v-if="statistics" class="mt-4">
                 <v-card class="pa-4 elevation-2">
                   <v-card-title class="text-h6 font-weight-bold">Statisztikai adatok</v-card-title>
@@ -121,12 +141,8 @@
   </div>
 </template>
 
-
-
-
-
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import api from '@/services/api';
 
@@ -187,7 +203,17 @@ export default {
         competitionResults.value = [];
       }
     };
+    const completedResults = computed(() =>
+      competitionResults.value.filter(
+        r => r.indulas && r.erkezes
+      )
+    );
 
+    const applications = computed(() =>
+      competitionResults.value.filter(
+        r => !r.indulas && !r.erkezes
+      )
+    );
 
     const identifyCompetitor = async () => {
       if (!tajszam.value) {
@@ -229,7 +255,6 @@ export default {
       }
     };
 
-
     const statistics = ref(null);
 
     const calculateStatistics = async (raceId, distanceId) => {
@@ -237,12 +262,15 @@ export default {
         const response = await api.get(
           "/versenyindulas");
         const allResults = response.data;
-
         const allResultsInCategory = [];
         const alapDatum = "2025-03-11";
 
         allResults.forEach((result) => {
-          if (result.versenyId === raceId && result.tav === distanceId) {
+          if (
+            result.versenyId === raceId &&
+            result.tav === distanceId &&
+            result.indulas && result.erkezes
+          ) {
             const differentiesInMs = new Date(`${alapDatum}T${result.erkezes}`) - new Date(`${alapDatum}T${result.indulas}`);
             const differentiesInMin = differentiesInMs / 60000;
             allResultsInCategory.push(
@@ -256,20 +284,19 @@ export default {
         allResultsInCategory.sort((a, b) => a.result - b.result);
 
         const rank = allResultsInCategory.findIndex(result => result.id === user.value.competitorId) + 1;
-
-        let median = 0;
-        const n = allResultsInCategory.length;
+        const numericResults = allResultsInCategory.map(r => Number(r.result)).filter(val => !isNaN(val));
+        const n = numericResults.length;
+        let median = null;
         if (n > 0) {
           if (n % 2 === 0) {
-            median = (allResultsInCategory[n / 2 - 1].result + allResultsInCategory[n / 2].result) / 2;
+            median = (numericResults[n / 2 - 1] + numericResults[n / 2]) / 2;
           } else {
-            median = allResultsInCategory[Math.floor(n / 2)].result;
+            median = numericResults[Math.floor(n / 2)];
           }
-        } else {
-          median = null;
         }
+
         const filteredResults = allResults.filter(
-          (r) => r.versenyId === raceId && r.tav === distanceId
+          (r) => r.versenyId === raceId && r.tav === distanceId && r.indulas && r.erkezes
         );
 
         if (!filteredResults.length) {
@@ -278,7 +305,7 @@ export default {
         }
 
         const competitorResult = competitionResults.value.find(
-          (r) => r.versenyId === raceId && r.tav === distanceId
+          (r) => r.versenyId === raceId && r.tav === distanceId && r.indulas && r.erkezes
         );
         if (!competitorResult) {
           statistics.value = null;
@@ -286,9 +313,7 @@ export default {
         }
 
         const competitorTime = (new Date(`${alapDatum}T${competitorResult.erkezes}`) - new Date(`${alapDatum}T${competitorResult.indulas}`)) / 60000;
-
         const competitorPace = competitorTime / competitorResult.tav;
-
 
         statistics.value = {
           rank,
@@ -364,7 +389,6 @@ export default {
       }
     };
 
-
     const logout = () => {
       sessionStorage.removeItem("user");
       window.dispatchEvent(new Event("loginStatusChanged"));
@@ -388,6 +412,8 @@ export default {
       ujVersenyzo,
       newCompetitor,
       createAndAssignCompetitor,
+      completedResults,
+      applications,
     };
   },
 };
